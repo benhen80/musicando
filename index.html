@@ -1,711 +1,534 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0b0f1c">
-  <title>Ditones · Allenamento casuale</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    html, body {
-      overflow-x: hidden;
-    }
-    body {
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(145deg, #0b0f1c 0%, #1a1f2e 100%);
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 1rem;
-      color: #eef2ff;
-    }
-    .dashboard {
-      max-width: 1200px;
-      width: 100%;
-      background: rgba(18, 24, 38, 0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-radius: 2rem;
-      padding: 1.5rem 1.2rem 2rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(120, 130, 200, 0.2);
-    }
-    h1 {
-      font-size: 1.6rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-bottom: 0.5rem;
-      color: #ffffff;
-      line-height: 1.2;
-    }
-    h1 span {
-      background: linear-gradient(135deg, #a78bfa, #60a5fa);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      font-weight: 700;
-    }
-    .subhead {
-      color: #94a3b8;
-      font-size: 0.85rem;
-      margin-bottom: 1.4rem;
-      border-left: 3px solid #3b82f6;
-      padding-left: 0.8rem;
-      font-weight: 400;
-      letter-spacing: 0.2px;
-      line-height: 1.45;
-    }
-    .main-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      margin-bottom: 1.5rem;
-    }
-    .exercise-card {
-      background: linear-gradient(160deg, #1e263b, #131a2b);
-      border-radius: 1.5rem;
-      padding: 1.4rem 1rem 1.6rem;
-      border: 1px solid #2d3b5a;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 12px 24px -8px black;
-      text-align: center;
-    }
-    .label {
-      text-transform: uppercase;
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      font-weight: 600;
-      color: #7f8db0;
-      margin-bottom: 0.6rem;
-    }
-    .dito-sequence {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.6rem;
-      margin: 1rem 0 1rem;
-      flex-wrap: wrap;
-    }
-    .dito-badge {
-      width: 3.6rem;
-      height: 3.6rem;
-      border-radius: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.9rem;
-      font-weight: 800;
-      background: linear-gradient(145deg, #2a3655, #1b2238);
-      box-shadow: 0 6px 0 #0b0f19, 0 6px 14px rgba(0, 0, 0, 0.6);
-      border: 1px solid #4b5a80;
-      color: #f0f4ff;
-      font-feature-settings: "tnum";
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-      flex-shrink: 0;
-    }
-    .group-info {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      margin: 0.8rem 0 0.2rem;
-    }
-    .chip {
-      background: #1d263b;
-      padding: 0.35rem 0.9rem;
-      border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.8rem;
-      border: 1px solid #3e4d72;
-      color: #b3c2e2;
-    }
-    .chip strong {
-      color: #b9a6ff;
-      font-weight: 700;
-    }
-    .strategy-side {
-      background: #141b2b;
-      border-radius: 1.5rem;
-      padding: 1.2rem 1rem;
-      border: 1px solid #2b354e;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
-      display: flex;
-      flex-direction: column;
-    }
-    .strategy-side h3 {
-      font-size: 1rem;
-      font-weight: 500;
-      color: #b7c5e5;
-      margin-bottom: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .strategy-buttons {
-      display: flex;
-      flex-direction: row;
-      gap: 0.6rem;
-      margin-top: 0.25rem;
-    }
-    .strategy-btn {
-      flex: 1;
-      background: #1f2a40;
-      border: 1.5px solid #35435f;
-      color: #dfe8ff;
-      padding: 0.85rem 0.5rem;
-      border-radius: 1.2rem;
-      font-weight: 500;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.15s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      text-align: center;
-      box-shadow: 0 4px 0 #0b0f17;
-      min-height: 68px;
-      line-height: 1.2;
-    }
-    .strategy-btn:hover {
-      background: #2c3a5a;
-      border-color: #5f7bc0;
-    }
-    .strategy-btn.active {
-      background: linear-gradient(145deg, #33457a, #1f2e53);
-      border-color: #7d9cf5;
-      box-shadow: 0 0 0 2px #3d5fb0, 0 4px 0 #0b0f17;
-      color: white;
-    }
-    .strategy-btn .icon {
-      font-size: 1.2rem;
-    }
-    .strategy-btn small {
-      font-size: 0.65rem;
-      color: #8ea1d0;
-      background: #0b101c;
-      padding: 2px 7px;
-      border-radius: 20px;
-    }
-    .strategy-btn.active small {
-      color: #c4d0ff;
-    }
-    .strategy-desc {
-      margin-top: 0.8rem;
-      font-size: 0.75rem;
-      color: #7988b0;
-      text-align: center;
-    }
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
-      margin-top: 1.5rem;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #4f6ef2, #3b4eca);
-      border: 1px solid #8fa4ff;
-      padding: 1rem 1.5rem;
-      border-radius: 1.5rem;
-      font-weight: 600;
-      font-size: 1.05rem;
-      color: white;
-      cursor: pointer;
-      transition: all 0.15s;
-      box-shadow: 0 7px 0 #1a2250, 0 8px 20px #2c3b8e66;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      letter-spacing: 0.3px;
-      width: 100%;
-      touch-action: manipulation;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #6383ff, #4a60e0);
-    }
-    .btn-primary:active {
-      transform: translateY(4px);
-      box-shadow: 0 3px 0 #1a2250, 0 6px 14px #0b0f1c;
-    }
-    .btn-secondary {
-      background: #1f2537;
-      border: 1.5px solid #39445e;
-      padding: 0.85rem 1.2rem;
-      border-radius: 1.5rem;
-      font-weight: 500;
-      font-size: 0.95rem;
-      color: #cfd9f5;
-      cursor: pointer;
-      transition: all 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      touch-action: manipulation;
-    }
-    .btn-secondary:hover {
-      background: #293245;
-      border-color: #5b6e99;
-    }
-    .btn-secondary:active {
-      background: #2e3a53;
-    }
-    .full-table-section {
-      margin-top: 2rem;
-      border-top: 1px solid #28314a;
-      padding-top: 1.5rem;
-    }
-    .full-table-section h3 {
-      font-weight: 500;
-      color: #b7c2df;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1rem;
-    }
-    .table-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      border-radius: 1rem;
-      background: #0d1220;
-      border: 1px solid #28314a;
-      padding: 0.2rem;
-      scrollbar-width: thin;
-      scrollbar-color: #3b4a6b #0d1220;
-    }
-    .table-wrapper::-webkit-scrollbar {
-      height: 6px;
-    }
-    .table-wrapper::-webkit-scrollbar-thumb {
-      background: #3b4a6b;
-      border-radius: 3px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      min-width: 620px;
-    }
-    th {
-      text-align: left;
-      padding: 0.8rem 0.6rem 0.6rem;
-      color: #99a9cf;
-      font-weight: 500;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      border-bottom: 1px solid #2f3b58;
-      white-space: nowrap;
-    }
-    th span {
-      display: block;
-      font-weight: 400;
-      text-transform: none;
-      font-size: 0.65rem;
-      color: #6d7da3;
-      margin-top: 2px;
-    }
-    td {
-      padding: 0.7rem 0.6rem;
-      color: #d7e0f5;
-      border-bottom: 1px solid #1e253b;
-      font-family: 'JetBrains Mono', 'Fira Code', monospace;
-      font-size: 0.85rem;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-    }
-    tr:last-child td {
-      border-bottom: none;
-    }
-    td:first-child {
-      font-weight: 600;
-      color: #b9aaff;
-      font-family: inherit;
-    }
-    .highlight-row {
-      background: #1f2c4b;
-      box-shadow: inset 0 0 0 1px #4f6ef2;
-    }
-    .highlight-cell {
-      background: #314e9b;
-      color: white;
-      font-weight: 700;
-      border-radius: 6px;
-    }
-    .footer-note {
-      margin-top: 1.5rem;
-      font-size: 0.75rem;
-      color: #64729b;
-      text-align: center;
-      border-top: 1px solid #1e253b;
-      padding-top: 1.2rem;
-      line-height: 1.5;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Musica è Vita · Studio Chitarra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #070a0f;
+    --card-surface: rgba(18, 25, 38, 0.75);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --amber-bright: #ffbe3b;
+    --amber-gold: #f59e0b;
+    --amber-glow: rgba(245, 158, 11, 0.28);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
 
-    /* ============ TABLET / DESKTOP ============ */
-    @media (min-width: 700px) {
-      body {
-        padding: 1.5rem;
-        align-items: center;
-      }
-      .dashboard {
-        border-radius: 3rem;
-        padding: 2rem 2rem 2.5rem;
-      }
-      h1 {
-        font-size: 2.2rem;
-        gap: 0.75rem;
-      }
-      .subhead {
-        font-size: 1rem;
-        margin-bottom: 2rem;
-        padding-left: 1rem;
-      }
-      .main-panel {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 2rem;
-        margin-bottom: 1.8rem;
-      }
-      .exercise-card {
-        flex: 2;
-        min-width: 340px;
-        border-radius: 2rem;
-        padding: 2rem 2rem 2.2rem;
-      }
-      .dito-badge {
-        width: 5rem;
-        height: 5rem;
-        border-radius: 1.8rem;
-        font-size: 2.6rem;
-        box-shadow: 0 10px 0 #0b0f19, 0 8px 20px rgba(0, 0, 0, 0.6);
-      }
-      .dito-sequence {
-        gap: 1rem;
-        margin: 1.2rem 0;
-      }
-      .chip {
-        padding: 0.4rem 1.2rem;
-        font-size: 0.9rem;
-      }
-      .strategy-side {
-        flex: 1;
-        min-width: 240px;
-        border-radius: 2rem;
-        padding: 1.6rem 1.4rem;
-      }
-      .strategy-side h3 {
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-      }
-      .strategy-buttons {
-        flex-direction: column;
-        gap: 0.85rem;
-      }
-      .strategy-btn {
-        flex-direction: row;
-        justify-content: flex-start;
-        text-align: left;
-        min-height: auto;
-        padding: 0.9rem 1.2rem;
-        border-radius: 1.5rem;
-        font-size: 1rem;
-        gap: 12px;
-      }
-      .strategy-btn small {
-        margin-left: auto;
-        font-size: 0.7rem;
-        padding: 3px 8px;
-      }
-      .strategy-btn .icon {
-        font-size: 1.4rem;
-      }
-      .strategy-desc {
-        text-align: left;
-        padding-top: 1rem;
-        margin-top: auto;
-      }
-      .controls {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .btn-primary {
-        width: auto;
-        padding: 1rem 2.4rem;
-        border-radius: 3rem;
-        font-size: 1.15rem;
-        box-shadow: 0 10px 0 #1a2250, 0 8px 20px #2c3b8e66;
-      }
-      .btn-secondary {
-        width: auto;
-        padding: 0.8rem 1.6rem;
-        border-radius: 2rem;
-      }
-      .full-table-section h3 {
-        font-size: 1.15rem;
-        margin-bottom: 1.2rem;
-      }
-      .table-wrapper {
-        border-radius: 1.5rem;
-      }
-      table {
-        font-size: 0.9rem;
-        min-width: 700px;
-      }
-      th {
-        padding: 1rem 1rem 0.7rem;
-        font-size: 0.75rem;
-      }
-      td {
-        padding: 0.8rem 1rem;
-        font-size: 0.9rem;
-      }
-      .footer-note {
-        margin-top: 1.8rem;
-        font-size: 0.8rem;
-        padding-top: 1.5rem;
-      }
-    }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-    /* Schermi molto piccoli */
-    @media (max-width: 380px) {
-      .dito-badge {
-        width: 3rem;
-        height: 3rem;
-        font-size: 1.5rem;
-        border-radius: 1rem;
-      }
-      h1 {
-        font-size: 1.4rem;
-      }
-      .strategy-btn {
-        font-size: 0.75rem;
-        padding: 0.7rem 0.4rem;
-      }
-      .strategy-btn .icon {
-        font-size: 1rem;
-      }
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 18px;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-deep);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ——— SFONDO: MANICO DI CHITARRA STILIZZATO CON SEGNATASTI ——— */
+  .fretboard-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+    background-image: 
+      /* Tasti orizzontali */
+      repeating-linear-gradient(180deg, transparent 0, transparent 99px, rgba(255,255,255,0.06) 100px),
+      /* Corde verticali */
+      repeating-linear-gradient(90deg, transparent 0, transparent 48px, rgba(255,255,255,0.04) 49px, rgba(255,255,255,0.08) 50px);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 80%);
+  }
+
+  /* Luci ambiente diffuse */
+  .ambient-glow {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(140px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-gold {
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%);
+  }
+  .glow-blue {
+    bottom: -150px;
+    right: 5%;
+    background: radial-gradient(circle, rgba(56, 114, 224, 0.16) 0%, transparent 70%);
+  }
+
+  /* ——— CONTENITORE CENTRALE GLASSMORPHIC ——— */
+  .container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 560px;
+    background: var(--card-surface);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 38px 32px;
+    box-shadow: 
+      0 30px 80px rgba(0, 0, 0, 0.65),
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    animation: fadeIn .8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ——— HEADER ——— */
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber-bright);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+
+  .pulse-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--amber-bright);
+    box-shadow: 0 0 10px var(--amber-gold);
+    position: relative;
+  }
+  .pulse-indicator::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1px solid var(--amber-bright);
+    animation: ping 2s infinite ease-out;
+  }
+  @keyframes ping {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.6); opacity: 0; }
+  }
+
+  h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(34px, 7vw, 44px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    margin-bottom: 12px;
+  }
+
+  .accent-gradient {
+    background: linear-gradient(135deg, #ffe28a 0%, #f59e0b 60%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+  }
+
+  /* ——— LISTA LINK/PULSANTI ——— */
+  .grid-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .menu-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    overflow: hidden;
+  }
+
+  /* Riflesso luce al passaggio del cursore */
+  .menu-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+  .menu-card:hover::before {
+    transform: translateX(100%);
+  }
+
+  .menu-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6), 0 0 25px -8px var(--amber-glow);
+  }
+
+  /* Pulsante Principale in evidenza */
+  .menu-card.featured {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(245, 158, 11, 0.04) 100%);
+    border-color: rgba(245, 158, 11, 0.35);
+  }
+  .menu-card.featured:hover {
+    border-color: rgba(255, 190, 59, 0.7);
+    box-shadow: 0 14px 34px -8px rgba(245, 158, 11, 0.35);
+  }
+
+  /* Icone vettoriali */
+  .icon-wrapper {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--amber-bright);
+    transition: all 0.25s ease;
+  }
+
+  .icon-wrapper svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.8;
+  }
+
+  .menu-card:hover .icon-wrapper {
+    background: var(--amber-gold);
+    border-color: var(--amber-bright);
+    color: #0b0f17;
+    transform: scale(1.05) rotate(-3deg);
+  }
+
+  /* Info testuali */
+  .card-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+
+  .card-title {
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+
+  .card-tag {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+  }
+
+  .menu-card.featured .card-tag {
+    background: rgba(245, 158, 11, 0.22);
+    color: var(--amber-bright);
+  }
+
+  .card-description {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Freccia */
+  .card-arrow {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: transform 0.25s ease, color 0.25s ease;
+  }
+  .card-arrow svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+  .menu-card:hover .card-arrow {
+    transform: translateX(4px);
+    color: var(--amber-bright);
+  }
+
+  /* ——— FOOTER ——— */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Equalizzatore animato ad onda audio */
+  .soundwave {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2.5px;
+    height: 13px;
+  }
+  .soundwave span {
+    width: 2.5px;
+    background: var(--amber-gold);
+    border-radius: 3px;
+    opacity: 0.9;
+    animation: wave 1.2s ease-in-out infinite alternate;
+  }
+  .soundwave span:nth-child(1) { height: 4px; animation-delay: 0.1s; }
+  .soundwave span:nth-child(2) { height: 12px; animation-delay: 0.3s; }
+  .soundwave span:nth-child(3) { height: 7px; animation-delay: 0.5s; }
+  .soundwave span:nth-child(4) { height: 13px; animation-delay: 0.2s; }
+  .soundwave span:nth-child(5) { height: 5px; animation-delay: 0.4s; }
+
+  @keyframes wave {
+    0% { transform: scaleY(0.3); }
+    100% { transform: scaleY(1); }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 28px 20px 24px;
+      border-radius: 22px;
     }
-  </style>
+    .menu-card {
+      padding: 14px 14px;
+      gap: 12px;
+    }
+    .icon-wrapper {
+      width: 38px;
+      height: 38px;
+    }
+    .card-title {
+      font-size: 14.5px;
+    }
+    .card-description {
+      font-size: 12px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
 </head>
 <body>
-<div class="dashboard">
-  <h1>
-    <span>🎸 Ditones</span> · Studio random
-  </h1>
-  <div class="subhead">
-    I Ditones · 24 permutazioni delle dita 1 (indice), 2 (medio), 3 (anulare), 4 (mignolo)
-  </div>
 
-  <div class="main-panel">
-    <!-- CARD ESERCIZIO -->
-    <div class="exercise-card">
-      <div class="label">Esercizio estratto</div>
-      <div class="dito-sequence" id="ditoSequence"></div>
-      <div class="group-info">
-        <div class="chip" id="groupChip">Gruppo <strong>A</strong></div>
-        <div class="chip" id="startFingerChip">Inizio con <strong>1</strong></div>
-      </div>
-      <div style="margin-top: 0.9rem;">
-        <span class="chip" id="strategyHint" style="font-size:0.7rem;">modalità: colonna</span>
-      </div>
+  <!-- Sfondo chitarristico -->
+  <div class="fretboard-bg" aria-hidden="true"></div>
+  <div class="ambient-glow glow-gold" aria-hidden="true"></div>
+  <div class="ambient-glow glow-blue" aria-hidden="true"></div>
+
+  <main class="container">
+    
+    <!-- Tag superiore -->
+    <div class="header-badge">
+      <span class="pulse-indicator" aria-hidden="true"></span>
+      Musica è Vita
     </div>
 
-    <!-- PANNELLO STRATEGIE -->
-    <div class="strategy-side">
-      <h3>📌 Strategia di studio</h3>
-      <div class="strategy-buttons" id="strategyButtons">
-        <button class="strategy-btn active" data-strategy="colonna">
-          <span class="icon">⬇️</span> Studio per colonne
-          <small>verticale</small>
-        </button>
-        <button class="strategy-btn" data-strategy="riga">
-          <span class="icon">➡️</span> Studio per righe
-          <small>orizzontale</small>
-        </button>
+    <!-- Titolo principale -->
+    <h1>Studio <span class="accent-gradient">Chitarra</span></h1>
+    <p class="subtitle">Sintonizzati, accendi il metronomo e scegli il modulo da allenare per la sessione di oggi.</p>
+
+    <!-- Moduli di Studio -->
+    <div class="grid-links">
+
+      
+      <!-- 0. Ditones -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicando/ditones/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Sound waves / Improvvisazione -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Ditones</span>
+            <span class="card-tag">Jam</span>
+          </div>
+          <div class="card-description">Esercitati con i Ditones</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>      
+      <!-- 1. Note casuali (In primo piano) -->
+      <a class="menu-card featured" target="_blank" rel="noopener" href="https://benhen80.github.io/musicando/note/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Fretboard / Note -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Note casuali</span>
+            <span class="card-tag">Tastiera</span>
+          </div>
+          <div class="card-description">Riconoscimento istantaneo delle note sul manico</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- 2. Accordi casuali -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicando/accordi/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Accordi -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Accordi casuali</span>
+            <span class="card-tag">Armonia</span>
+          </div>
+          <div class="card-description">Memorizzazione e cambio forme sulla tastiera</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- 3. Workout Quotidiano -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicando/dashboard/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Workout / Dashboard -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Workout Quotidiano</span>
+            <span class="card-tag">Routine</span>
+          </div>
+          <div class="card-description">Segui la tua scaletta di esercizi su misura</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- 4. Metronomo -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicando/metronomo/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Metronomo / Tempo -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Metronomo</span>
+            <span class="card-tag">Timing</span>
+          </div>
+          <div class="card-description">Allena precisione, timing ritmico e velocità</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- 5. Suonare su Accordi -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicando/suonaresuaccordi/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Sound waves / Improvvisazione -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Suonare su Accordi</span>
+            <span class="card-tag">Jam</span>
+          </div>
+          <div class="card-description">Improvvisa e costruisci frasi sulle progressioni</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-left">
+        <span>Pratica quotidiana</span>
       </div>
-      <div class="strategy-desc" id="strategyDescription">
-        Colonne: stesso dito di partenza
+      <div class="soundwave" aria-label="Audio attivo" title="Audio attivo">
+        <span></span><span></span><span></span><span></span><span></span>
       </div>
-    </div>
-  </div>
+    </footer>
 
-  <!-- CONTROLLI -->
-  <div class="controls">
-    <button class="btn-primary" id="randomBtn">
-      <span>🎲</span> Nuovo esercizio
-    </button>
-    <button class="btn-secondary" id="nextInSequenceBtn">
-      <span>⏩</span> Prossimo nella sequenza
-    </button>
-  </div>
+  </main>
 
-  <!-- TABELLA COMPLETA -->
-  <div class="full-table-section">
-    <h3>📋 Tabella completa dei Ditones</h3>
-    <div class="table-wrapper">
-      <table id="ditonesTable">
-        <thead>
-          <tr>
-            <th>Gruppo</th>
-            <th>Colonna 1<span>inizio 1</span></th>
-            <th>Colonna 2<span>inizio 2</span></th>
-            <th>Colonna 3<span>inizio 3</span></th>
-            <th>Colonna 4<span>inizio 4</span></th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-    <div class="footer-note">
-      Ogni dito suona una volta per combinazione · 24 ditones totali · Evidenziato l'esercizio corrente
-    </div>
-  </div>
-</div>
-
-<script>
-  (function() {
-    const ditoneTable = [
-      { group: 'A', columns: [ [1,2,3,4], [2,3,4,1], [3,4,1,2], [4,1,2,3] ] },
-      { group: 'B', columns: [ [1,2,4,3], [2,4,3,1], [3,1,2,4], [4,3,1,2] ] },
-      { group: 'C', columns: [ [1,3,2,4], [2,4,1,3], [3,2,4,1], [4,1,3,2] ] },
-      { group: 'D', columns: [ [1,3,4,2], [2,1,3,4], [3,4,2,1], [4,2,1,3] ] },
-      { group: 'E', columns: [ [1,4,2,3], [2,3,1,4], [3,1,4,2], [4,2,3,1] ] },
-      { group: 'F', columns: [ [1,4,3,2], [2,1,4,3], [3,2,1,4], [4,3,2,1] ] }
-    ];
-
-    const groupMap = {};
-    ditoneTable.forEach((g) => { groupMap[g.group] = g.columns; });
-
-    let currentGroup = 'A';
-    let currentColumnIndex = 0;
-    let strategy = 'colonna';
-
-    const ditoSequenceEl = document.getElementById('ditoSequence');
-    const groupChip = document.getElementById('groupChip');
-    const startFingerChip = document.getElementById('startFingerChip');
-    const strategyHint = document.getElementById('strategyHint');
-    const strategyDescription = document.getElementById('strategyDescription');
-    const randomBtn = document.getElementById('randomBtn');
-    const nextInSequenceBtn = document.getElementById('nextInSequenceBtn');
-    const strategyButtons = document.querySelectorAll('.strategy-btn');
-    const tableBody = document.getElementById('tableBody');
-
-    function getSequence(group, colIndex) {
-      const cols = groupMap[group];
-      return (cols && cols[colIndex]) ? cols[colIndex] : [1,2,3,4];
-    }
-
-    function renderCurrentExercise() {
-      const seq = getSequence(currentGroup, currentColumnIndex);
-      ditoSequenceEl.innerHTML = seq.map(num => `<div class="dito-badge">${num}</div>`).join('');
-      groupChip.innerHTML = `Gruppo <strong>${currentGroup}</strong>`;
-      startFingerChip.innerHTML = `Inizio con <strong>${seq[0]}</strong>`;
-      strategyHint.textContent = strategy === 'colonna' ? 'modalità: colonna' : 'modalità: riga';
-      highlightTable();
-    }
-
-    function highlightTable() {
-      const rows = tableBody.querySelectorAll('tr');
-      rows.forEach(tr => tr.classList.remove('highlight-row'));
-      tableBody.querySelectorAll('td').forEach(td => td.classList.remove('highlight-cell'));
-
-      for (let r = 0; r < rows.length; r++) {
-        const row = rows[r];
-        if (row.dataset.group === currentGroup) {
-          row.classList.add('highlight-row');
-          const cells = row.querySelectorAll('td');
-          const target = cells[currentColumnIndex + 1];
-          if (target) target.classList.add('highlight-cell');
-          break;
-        }
-      }
-    }
-
-    function buildTable() {
-      let html = '';
-      ditoneTable.forEach(row => {
-        html += `<tr data-group="${row.group}">`;
-        html += `<td>${row.group}</td>`;
-        row.columns.forEach(col => {
-          html += `<td>${col.join(' ')}</td>`;
-        });
-        html += `</tr>`;
-      });
-      tableBody.innerHTML = html;
-    }
-
-    function getRandomExercise() {
-      const idx = Math.floor(Math.random() * ditoneTable.length);
-      return {
-        group: ditoneTable[idx].group,
-        colIndex: Math.floor(Math.random() * 4)
-      };
-    }
-
-    function setExercise(group, colIndex) {
-      currentGroup = group;
-      currentColumnIndex = colIndex;
-      renderCurrentExercise();
-    }
-
-    function nextInStrategy() {
-      if (strategy === 'colonna') {
-        const currentIdx = ditoneTable.findIndex(g => g.group === currentGroup);
-        const nextIdx = (currentIdx + 1) % ditoneTable.length;
-        setExercise(ditoneTable[nextIdx].group, currentColumnIndex);
-      } else {
-        setExercise(currentGroup, (currentColumnIndex + 1) % 4);
-      }
-    }
-
-    function setStrategy(newStrategy) {
-      strategy = newStrategy;
-      strategyButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.strategy === newStrategy);
-      });
-      strategyDescription.textContent = newStrategy === 'colonna'
-        ? 'Colonne: stesso dito di partenza'
-        : 'Righe: stessa riga, diteggiature diverse';
-      renderCurrentExercise();
-    }
-
-    function init() {
-      buildTable();
-      const first = getRandomExercise();
-      setExercise(first.group, first.colIndex);
-      setStrategy('colonna');
-
-      randomBtn.addEventListener('click', () => {
-        const rnd = getRandomExercise();
-        setExercise(rnd.group, rnd.colIndex);
-      });
-
-      nextInSequenceBtn.addEventListener('click', nextInStrategy);
-
-      strategyButtons.forEach(btn => {
-        btn.addEventListener('click', () => setStrategy(btn.dataset.strategy));
-      });
-    }
-
-    init();
-  })();
-</script>
 </body>
 </html>
