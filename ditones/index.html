@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0f1c">
+  <title>Ditones · Allenamento casuale</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      overflow-x: hidden;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(145deg, #0b0f1c 0%, #1a1f2e 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 1rem;
+      color: #eef2ff;
+    }
+    .dashboard {
+      max-width: 1200px;
+      width: 100%;
+      background: rgba(18, 24, 38, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 2rem;
+      padding: 1.5rem 1.2rem 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(120, 130, 200, 0.2);
+    }
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    h1 span {
+      background: linear-gradient(135deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+    .subhead {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      margin-bottom: 1.4rem;
+      border-left: 3px solid #3b82f6;
+      padding-left: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+      line-height: 1.45;
+    }
+    .main-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .exercise-card {
+      background: linear-gradient(160deg, #1e263b, #131a2b);
+      border-radius: 1.5rem;
+      padding: 1.4rem 1rem 1.6rem;
+      border: 1px solid #2d3b5a;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 12px 24px -8px black;
+      text-align: center;
+    }
+    .label {
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      font-weight: 600;
+      color: #7f8db0;
+      margin-bottom: 0.6rem;
+    }
+    .dito-sequence {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 1rem 0 1rem;
+      flex-wrap: wrap;
+    }
+    .dito-badge {
+      width: 3.6rem;
+      height: 3.6rem;
+      border-radius: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(145deg, #2a3655, #1b2238);
+      box-shadow: 0 6px 0 #0b0f19, 0 6px 14px rgba(0, 0, 0, 0.6);
+      border: 1px solid #4b5a80;
+      color: #f0f4ff;
+      font-feature-settings: "tnum";
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+    }
+    .group-info {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 0.8rem 0 0.2rem;
+    }
+    .chip {
+      background: #1d263b;
+      padding: 0.35rem 0.9rem;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.8rem;
+      border: 1px solid #3e4d72;
+      color: #b3c2e2;
+    }
+    .chip strong {
+      color: #b9a6ff;
+      font-weight: 700;
+    }
+    .strategy-side {
+      background: #141b2b;
+      border-radius: 1.5rem;
+      padding: 1.2rem 1rem;
+      border: 1px solid #2b354e;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+    }
+    .strategy-side h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #b7c5e5;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .strategy-buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 0.6rem;
+      margin-top: 0.25rem;
+    }
+    .strategy-btn {
+      flex: 1;
+      background: #1f2a40;
+      border: 1.5px solid #35435f;
+      color: #dfe8ff;
+      padding: 0.85rem 0.5rem;
+      border-radius: 1.2rem;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+      box-shadow: 0 4px 0 #0b0f17;
+      min-height: 68px;
+      line-height: 1.2;
+    }
+    .strategy-btn:hover {
+      background: #2c3a5a;
+      border-color: #5f7bc0;
+    }
+    .strategy-btn.active {
+      background: linear-gradient(145deg, #33457a, #1f2e53);
+      border-color: #7d9cf5;
+      box-shadow: 0 0 0 2px #3d5fb0, 0 4px 0 #0b0f17;
+      color: white;
+    }
+    .strategy-btn .icon {
+      font-size: 1.2rem;
+    }
+    .strategy-btn small {
+      font-size: 0.65rem;
+      color: #8ea1d0;
+      background: #0b101c;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+    .strategy-btn.active small {
+      color: #c4d0ff;
+    }
+    .strategy-desc {
+      margin-top: 0.8rem;
+      font-size: 0.75rem;
+      color: #7988b0;
+      text-align: center;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin-top: 1.5rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f6ef2, #3b4eca);
+      border: 1px solid #8fa4ff;
+      padding: 1rem 1.5rem;
+      border-radius: 1.5rem;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 7px 0 #1a2250, 0 8px 20px #2c3b8e66;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: 0.3px;
+      width: 100%;
+      touch-action: manipulation;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #6383ff, #4a60e0);
+    }
+    .btn-primary:active {
+      transform: translateY(4px);
+      box-shadow: 0 3px 0 #1a2250, 0 6px 14px #0b0f1c;
+    }
+    .btn-secondary {
+      background: #1f2537;
+      border: 1.5px solid #39445e;
+      padding: 0.85rem 1.2rem;
+      border-radius: 1.5rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #cfd9f5;
+      cursor: pointer;
+      transition: all 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      touch-action: manipulation;
+    }
+    .btn-secondary:hover {
+      background: #293245;
+      border-color: #5b6e99;
+    }
+    .btn-secondary:active {
+      background: #2e3a53;
+    }
+    .full-table-section {
+      margin-top: 2rem;
+      border-top: 1px solid #28314a;
+      padding-top: 1.5rem;
+    }
+    .full-table-section h3 {
+      font-weight: 500;
+      color: #b7c2df;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 1rem;
+      background: #0d1220;
+      border: 1px solid #28314a;
+      padding: 0.2rem;
+      scrollbar-width: thin;
+      scrollbar-color: #3b4a6b #0d1220;
+    }
+    .table-wrapper::-webkit-scrollbar {
+      height: 6px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: #3b4a6b;
+      border-radius: 3px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 620px;
+    }
+    th {
+      text-align: left;
+      padding: 0.8rem 0.6rem 0.6rem;
+      color: #99a9cf;
+      font-weight: 500;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      border-bottom: 1px solid #2f3b58;
+      white-space: nowrap;
+    }
+    th span {
+      display: block;
+      font-weight: 400;
+      text-transform: none;
+      font-size: 0.65rem;
+      color: #6d7da3;
+      margin-top: 2px;
+    }
+    td {
+      padding: 0.7rem 0.6rem;
+      color: #d7e0f5;
+      border-bottom: 1px solid #1e253b;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    td:first-child {
+      font-weight: 600;
+      color: #b9aaff;
+      font-family: inherit;
+    }
+    .highlight-row {
+      background: #1f2c4b;
+      box-shadow: inset 0 0 0 1px #4f6ef2;
+    }
+    .highlight-cell {
+      background: #314e9b;
+      color: white;
+      font-weight: 700;
+      border-radius: 6px;
+    }
+    .footer-note {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: #64729b;
+      text-align: center;
+      border-top: 1px solid #1e253b;
+      padding-top: 1.2rem;
+      line-height: 1.5;
+    }
+
+    /* ============ TABLET / DESKTOP ============ */
+    @media (min-width: 700px) {
+      body {
+        padding: 1.5rem;
+        align-items: center;
+      }
+      .dashboard {
+        border-radius: 3rem;
+        padding: 2rem 2rem 2.5rem;
+      }
+      h1 {
+        font-size: 2.2rem;
+        gap: 0.75rem;
+      }
+      .subhead {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+        padding-left: 1rem;
+      }
+      .main-panel {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin-bottom: 1.8rem;
+      }
+      .exercise-card {
+        flex: 2;
+        min-width: 340px;
+        border-radius: 2rem;
+        padding: 2rem 2rem 2.2rem;
+      }
+      .dito-badge {
+        width: 5rem;
+        height: 5rem;
+        border-radius: 1.8rem;
+        font-size: 2.6rem;
+        box-shadow: 0 10px 0 #0b0f19, 0 8px 20px rgba(0, 0, 0, 0.6);
+      }
+      .dito-sequence {
+        gap: 1rem;
+        margin: 1.2rem 0;
+      }
+      .chip {
+        padding: 0.4rem 1.2rem;
+        font-size: 0.9rem;
+      }
+      .strategy-side {
+        flex: 1;
+        min-width: 240px;
+        border-radius: 2rem;
+        padding: 1.6rem 1.4rem;
+      }
+      .strategy-side h3 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+      }
+      .strategy-buttons {
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+      .strategy-btn {
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: left;
+        min-height: auto;
+        padding: 0.9rem 1.2rem;
+        border-radius: 1.5rem;
+        font-size: 1rem;
+        gap: 12px;
+      }
+      .strategy-btn small {
+        margin-left: auto;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+      }
+      .strategy-btn .icon {
+        font-size: 1.4rem;
+      }
+      .strategy-desc {
+        text-align: left;
+        padding-top: 1rem;
+        margin-top: auto;
+      }
+      .controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .btn-primary {
+        width: auto;
+        padding: 1rem 2.4rem;
+        border-radius: 3rem;
+        font-size: 1.15rem;
+        box-shadow: 0 10px 0 #1a2250, 0 8px 20px #2c3b8e66;
+      }
+      .btn-secondary {
+        width: auto;
+        padding: 0.8rem 1.6rem;
+        border-radius: 2rem;
+      }
+      .full-table-section h3 {
+        font-size: 1.15rem;
+        margin-bottom: 1.2rem;
+      }
+      .table-wrapper {
+        border-radius: 1.5rem;
+      }
+      table {
+        font-size: 0.9rem;
+        min-width: 700px;
+      }
+      th {
+        padding: 1rem 1rem 0.7rem;
+        font-size: 0.75rem;
+      }
+      td {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+      }
+      .footer-note {
+        margin-top: 1.8rem;
+        font-size: 0.8rem;
+        padding-top: 1.5rem;
+      }
+    }
+
+    /* Schermi molto piccoli */
+    @media (max-width: 380px) {
+      .dito-badge {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.5rem;
+        border-radius: 1rem;
+      }
+      h1 {
+        font-size: 1.4rem;
+      }
+      .strategy-btn {
+        font-size: 0.75rem;
+        padding: 0.7rem 0.4rem;
+      }
+      .strategy-btn .icon {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="dashboard">
+  <h1>
+    <span>🎸 Ditones</span> · Studio random
+  </h1>
+  <div class="subhead">
+    I Ditones · 24 permutazioni delle dita 1 (indice), 2 (medio), 3 (anulare), 4 (mignolo)
+  </div>
+
+  <div class="main-panel">
+    <!-- CARD ESERCIZIO -->
+    <div class="exercise-card">
+      <div class="label">Esercizio estratto</div>
+      <div class="dito-sequence" id="ditoSequence"></div>
+      <div class="group-info">
+        <div class="chip" id="groupChip">Gruppo <strong>A</strong></div>
+        <div class="chip" id="startFingerChip">Inizio con <strong>1</strong></div>
+      </div>
+      <div style="margin-top: 0.9rem;">
+        <span class="chip" id="strategyHint" style="font-size:0.7rem;">modalità: colonna</span>
+      </div>
+    </div>
+
+    <!-- PANNELLO STRATEGIE -->
+    <div class="strategy-side">
+      <h3>📌 Strategia di studio</h3>
+      <div class="strategy-buttons" id="strategyButtons">
+        <button class="strategy-btn active" data-strategy="colonna">
+          <span class="icon">⬇️</span> Studio per colonne
+          <small>verticale</small>
+        </button>
+        <button class="strategy-btn" data-strategy="riga">
+          <span class="icon">➡️</span> Studio per righe
+          <small>orizzontale</small>
+        </button>
+      </div>
+      <div class="strategy-desc" id="strategyDescription">
+        Colonne: stesso dito di partenza
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLLI -->
+  <div class="controls">
+    <button class="btn-primary" id="randomBtn">
+      <span>🎲</span> Nuovo esercizio
+    </button>
+    <button class="btn-secondary" id="nextInSequenceBtn">
+      <span>⏩</span> Prossimo nella sequenza
+    </button>
+  </div>
+
+  <!-- TABELLA COMPLETA -->
+  <div class="full-table-section">
+    <h3>📋 Tabella completa dei Ditones</h3>
+    <div class="table-wrapper">
+      <table id="ditonesTable">
+        <thead>
+          <tr>
+            <th>Gruppo</th>
+            <th>Colonna 1<span>inizio 1</span></th>
+            <th>Colonna 2<span>inizio 2</span></th>
+            <th>Colonna 3<span>inizio 3</span></th>
+            <th>Colonna 4<span>inizio 4</span></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="footer-note">
+      Ogni dito suona una volta per combinazione · 24 ditones totali · Evidenziato l'esercizio corrente
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const ditoneTable = [
+      { group: 'A', columns: [ [1,2,3,4], [2,3,4,1], [3,4,1,2], [4,1,2,3] ] },
+      { group: 'B', columns: [ [1,2,4,3], [2,4,3,1], [3,1,2,4], [4,3,1,2] ] },
+      { group: 'C', columns: [ [1,3,2,4], [2,4,1,3], [3,2,4,1], [4,1,3,2] ] },
+      { group: 'D', columns: [ [1,3,4,2], [2,1,3,4], [3,4,2,1], [4,2,1,3] ] },
+      { group: 'E', columns: [ [1,4,2,3], [2,3,1,4], [3,1,4,2], [4,2,3,1] ] },
+      { group: 'F', columns: [ [1,4,3,2], [2,1,4,3], [3,2,1,4], [4,3,2,1] ] }
+    ];
+
+    const groupMap = {};
+    ditoneTable.forEach((g) => { groupMap[g.group] = g.columns; });
+
+    let currentGroup = 'A';
+    let currentColumnIndex = 0;
+    let strategy = 'colonna';
+
+    const ditoSequenceEl = document.getElementById('ditoSequence');
+    const groupChip = document.getElementById('groupChip');
+    const startFingerChip = document.getElementById('startFingerChip');
+    const strategyHint = document.getElementById('strategyHint');
+    const strategyDescription = document.getElementById('strategyDescription');
+    const randomBtn = document.getElementById('randomBtn');
+    const nextInSequenceBtn = document.getElementById('nextInSequenceBtn');
+    const strategyButtons = document.querySelectorAll('.strategy-btn');
+    const tableBody = document.getElementById('tableBody');
+
+    function getSequence(group, colIndex) {
+      const cols = groupMap[group];
+      return (cols && cols[colIndex]) ? cols[colIndex] : [1,2,3,4];
+    }
+
+    function renderCurrentExercise() {
+      const seq = getSequence(currentGroup, currentColumnIndex);
+      ditoSequenceEl.innerHTML = seq.map(num => `<div class="dito-badge">${num}</div>`).join('');
+      groupChip.innerHTML = `Gruppo <strong>${currentGroup}</strong>`;
+      startFingerChip.innerHTML = `Inizio con <strong>${seq[0]}</strong>`;
+      strategyHint.textContent = strategy === 'colonna' ? 'modalità: colonna' : 'modalità: riga';
+      highlightTable();
+    }
+
+    function highlightTable() {
+      const rows = tableBody.querySelectorAll('tr');
+      rows.forEach(tr => tr.classList.remove('highlight-row'));
+      tableBody.querySelectorAll('td').forEach(td => td.classList.remove('highlight-cell'));
+
+      for (let r = 0; r < rows.length; r++) {
+        const row = rows[r];
+        if (row.dataset.group === currentGroup) {
+          row.classList.add('highlight-row');
+          const cells = row.querySelectorAll('td');
+          const target = cells[currentColumnIndex + 1];
+          if (target) target.classList.add('highlight-cell');
+          break;
+        }
+      }
+    }
+
+    function buildTable() {
+      let html = '';
+      ditoneTable.forEach(row => {
+        html += `<tr data-group="${row.group}">`;
+        html += `<td>${row.group}</td>`;
+        row.columns.forEach(col => {
+          html += `<td>${col.join(' ')}</td>`;
+        });
+        html += `</tr>`;
+      });
+      tableBody.innerHTML = html;
+    }
+
+    function getRandomExercise() {
+      const idx = Math.floor(Math.random() * ditoneTable.length);
+      return {
+        group: ditoneTable[idx].group,
+        colIndex: Math.floor(Math.random() * 4)
+      };
+    }
+
+    function setExercise(group, colIndex) {
+      currentGroup = group;
+      currentColumnIndex = colIndex;
+      renderCurrentExercise();
+    }
+
+    function nextInStrategy() {
+      if (strategy === 'colonna') {
+        const currentIdx = ditoneTable.findIndex(g => g.group === currentGroup);
+        const nextIdx = (currentIdx + 1) % ditoneTable.length;
+        setExercise(ditoneTable[nextIdx].group, currentColumnIndex);
+      } else {
+        setExercise(currentGroup, (currentColumnIndex + 1) % 4);
+      }
+    }
+
+    function setStrategy(newStrategy) {
+      strategy = newStrategy;
+      strategyButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.strategy === newStrategy);
+      });
+      strategyDescription.textContent = newStrategy === 'colonna'
+        ? 'Colonne: stesso dito di partenza'
+        : 'Righe: stessa riga, diteggiature diverse';
+      renderCurrentExercise();
+    }
+
+    function init() {
+      buildTable();
+      const first = getRandomExercise();
+      setExercise(first.group, first.colIndex);
+      setStrategy('colonna');
+
+      randomBtn.addEventListener('click', () => {
+        const rnd = getRandomExercise();
+        setExercise(rnd.group, rnd.colIndex);
+      });
+
+      nextInSequenceBtn.addEventListener('click', nextInStrategy);
+
+      strategyButtons.forEach(btn => {
+        btn.addEventListener('click', () => setStrategy(btn.dataset.strategy));
+      });
+    }
+
+    init();
+  })();
+</script>
+</body>
+</html>

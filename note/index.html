@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Note casuali</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f3f1ec;--card:#ffffff;--card2:#ece9e1;--text:#1b2433;--muted:#5d6779;--accent:#c4741a;--accent-text:#ffffff;--line:#d9d4c8;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1624;--card:#1a2436;--card2:#121a2a;--text:#eef1f7;--muted:#9aa6bd;--accent:#e8a03c;--accent-text:#0f1624;--line:#2a364d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1624;--card:#1a2436;--card2:#121a2a;--text:#eef1f7;--muted:#9aa6bd;--accent:#e8a03c;--accent-text:#0f1624;--line:#2a364d;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;padding:16px}
+.wrap{max-width:760px;margin:0 auto;display:grid;gap:14px}
+.card{background:var(--card);border-radius:18px;padding:20px}
+.hero{border-left:5px solid var(--accent)}
+h1{font-family:Anton,Impact,'Arial Narrow',sans-serif;font-weight:400;color:var(--accent);font-size:38px;line-height:1;margin:0 0 10px;text-transform:uppercase}
+p{margin:0;color:var(--muted);line-height:1.5}
+.label{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
+input[type=number]{width:96px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--text);font:600 18px Inter,sans-serif}
+.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--text);padding:10px 14px;background:var(--card2);border-radius:10px;cursor:pointer}
+.chk input{accent-color:var(--accent);width:18px;height:18px}
+button{font:800 14px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;border:0;border-radius:10px;padding:12px 22px;cursor:pointer;background:var(--accent);color:var(--accent-text)}
+button.sec{background:var(--card2);color:var(--text)}
+button:disabled{opacity:.4;cursor:default}
+.stage{text-align:center;padding:28px 20px}
+.progress{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.note{font-family:Anton,Impact,sans-serif;font-size:min(34vw,220px);line-height:1.05;margin:8px 0;color:var(--text)}
+.note.idle{color:var(--muted);opacity:.4}
+.str{font-size:22px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);min-height:30px}
+.chip small{font:800 12px Inter,sans-serif;color:var(--accent);margin-left:6px}
+.count{font-family:Anton,Impact,sans-serif;font-size:56px;color:var(--accent)}
+.bar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;margin:14px auto 0;max-width:420px}
+.bar i{display:block;height:100%;width:100%;background:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--card2);border-radius:10px;padding:8px 12px;font-family:Anton,Impact,sans-serif;font-size:20px}
+.chip.now{outline:2px solid var(--accent)}
+.err{color:#d9534f;font-size:13px;margin-top:10px;min-height:16px}
+.flash{animation:fl .35s}
+@keyframes fl{from{transform:scale(1.12);color:var(--accent)}to{transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card hero">
+    <h1>Note casuali</h1>
+    <p>Scegli quante note eseguire e premi Submit. Ogni nota resta a schermo per il tempo impostato, poi cambia con un suono.</p>
+  </div>
+
+  <div class="card">
+    <div class="label">Impostazioni</div>
+    <div class="row">
+      <label class="field">Numero di note<input id="n" type="number" min="1" max="200" value="10"></label>
+      <label class="field">Secondi per nota<input id="s" type="number" min="2" max="120" value="10"></label>
+      <label class="chk"><input id="sharp" type="checkbox"> Diesis ♯</label>
+      <label class="chk"><input id="flat" type="checkbox"> Bemolle ♭</label>
+      <label class="chk"><input id="snd" type="checkbox" checked> Suono</label>
+      <label class="chk"><input id="strc" type="checkbox" checked> Corda</label>
+      <label class="chk"><input id="pnote" type="checkbox" checked> Suona nota</label>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <button id="go">Submit</button>
+      <button id="pause" class="sec" disabled>Pausa</button>
+      <button id="stop" class="sec" disabled>Stop</button>
+    </div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="card stage">
+    <div class="progress" id="prog">Pronto</div>
+    <div class="note idle" id="note">–</div>
+    <div class="str" id="str">&nbsp;</div>
+    <div class="count" id="cnt">&nbsp;</div>
+    <div class="bar"><i id="bar"></i></div>
+  </div>
+
+  <div class="card">
+    <div class="label">Estrazione</div>
+    <div class="chips" id="hist"><span style="color:var(--muted)">Le note estratte compariranno qui.</span></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const NAT = ['C','D','E','F','G','A','B'];
+const SHARPS = ['C♯','D♯','F♯','G♯','A♯'];
+const FLATS = ['D♭','E♭','G♭','A♭','B♭'];
+let ctx = null, timer = null, seq = [], idx = 0, secs = 10, endAt = 0, paused = false, leftMs = 0, lastShown = null;
+
+function beep(freq, dur, vol){
+  if(!$('snd').checked || !ctx) return;
+  try{
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + dur);
+  }catch(e){}
+}
+const changeSound = () => { beep(880, .25, .3); setTimeout(() => beep(1175, .3, .3), 120); };
+const tickSound = () => beep(520, .08, .15);
+
+const SEMI = {C:0, D:2, E:4, F:5, G:7, A:9, B:11};
+function freqOf(name){
+  let s = SEMI[name[0]];
+  if(name[1] === '♯') s++; else if(name[1] === '♭') s--;
+  return 261.63 * Math.pow(2, s / 12);
+}
+let cur = null;
+function stopNote(){
+  if(!cur || !ctx) return;
+  try{
+    cur.g.gain.cancelScheduledValues(ctx.currentTime);
+    cur.g.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.03);
+    cur.o.stop(ctx.currentTime + 0.2);
+  }catch(e){}
+  cur = null;
+}
+function playNote(name){
+  stopNote();
+  if(!$('snd').checked || !$('pnote').checked || !ctx) return;
+  try{
+    const t = ctx.currentTime + 0.45;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'triangle'; o.frequency.value = freqOf(name);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.35, t + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.15, t + 2.2);
+    g.gain.linearRampToValueAtTime(0.0001, t + 2.55);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + 2.6);
+    cur = {o, g};
+  }catch(e){}
+}
+
+const corda = () => $('strc').checked;
+function pool(){
+  let p = NAT.slice();
+  if($('sharp').checked) p = p.concat(SHARPS);
+  if($('flat').checked) p = p.concat(FLATS);
+  return p;
+}
+function buildSeq(n){
+  const p = pool(), out = [];
+  for(let i = 0; i < n; i++){
+    let x;
+    do { x = p[Math.floor(Math.random() * p.length)]; } while(out[i-1] && x === out[i-1].n && p.length > 1);
+    out.push({n: x, s: 1 + Math.floor(Math.random() * 6)});
+  }
+  return out;
+}
+function renderHist(){
+  $('hist').innerHTML = seq.map((x, i) =>
+    '<span class="chip' + (i === idx ? ' now' : '') + '" style="' + (i > idx ? 'opacity:.35' : '') + '">' + x.n + (corda() ? '<small>' + x.s + 'ª</small>' : '') + '</span>').join('');
+}
+function showNote(){
+  const el = $('note');
+  el.textContent = seq[idx].n;
+  playNote(seq[idx].n);
+  $('str').textContent = corda() ? seq[idx].s + 'ª corda' : '\u00a0';
+  el.classList.remove('idle', 'flash'); void el.offsetWidth; el.classList.add('flash');
+  $('prog').textContent = 'Nota ' + (idx + 1) + ' di ' + seq.length;
+  renderHist();
+}
+function setIdle(msg){
+  stopNote();
+  clearInterval(timer); timer = null; paused = false;
+  $('go').disabled = false; $('pause').disabled = true; $('stop').disabled = true;
+  $('pause').textContent = 'Pausa';
+  $('prog').textContent = msg;
+  $('cnt').innerHTML = '&nbsp;'; $('str').innerHTML = '&nbsp;'; $('bar').style.width = '100%';
+}
+function tick(){
+  const left = endAt - Date.now();
+  if(left <= 0){
+    idx++;
+    if(idx >= seq.length){
+      changeSound();
+      setIdle('Completato · ' + seq.length + ' note');
+      $('note').classList.add('idle');
+      idx = -1; renderHist();
+      return;
+    }
+    changeSound(); showNote();
+    endAt = Date.now() + secs * 1000;
+    lastShown = null;
+    return;
+  }
+  const sec = Math.ceil(left / 1000);
+  $('cnt').textContent = sec;
+  $('bar').style.width = (left / (secs * 1000) * 100) + '%';
+  if(sec !== lastShown){ lastShown = sec; if(sec <= 3) tickSound(); }
+}
+$('go').onclick = () => {
+  const n = parseInt($('n').value, 10), s = parseInt($('s').value, 10);
+  if(!(n >= 1 && n <= 200)){ $('err').textContent = 'Inserisci un numero di note tra 1 e 200.'; return; }
+  if(!(s >= 2 && s <= 120)){ $('err').textContent = 'I secondi per nota devono essere tra 2 e 120.'; return; }
+  $('err').textContent = '';
+  try{ ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if(ctx.state === 'suspended') ctx.resume(); }catch(e){}
+  secs = s; seq = buildSeq(n); idx = 0; lastShown = null;
+  $('go').disabled = true; $('pause').disabled = false; $('stop').disabled = false;
+  changeSound(); showNote();
+  endAt = Date.now() + secs * 1000;
+  clearInterval(timer); timer = setInterval(tick, 100); tick();
+};
+$('pause').onclick = () => {
+  if(!timer && !paused) return;
+  if(!paused){
+    stopNote(); paused = true; leftMs = endAt - Date.now(); clearInterval(timer); timer = null;
+    $('pause').textContent = 'Riprendi';
+  } else {
+    paused = false; endAt = Date.now() + leftMs;
+    timer = setInterval(tick, 100);
+    $('pause').textContent = 'Pausa';
+  }
+};
+$('stop').onclick = () => {
+  setIdle('Fermato');
+  $('note').textContent = '–'; $('note').classList.add('idle');
+  idx = -1; renderHist();
+};
+</script>
+</body>
+</html>

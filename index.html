@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Musica è Vita · Studio Chitarra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #070a0f;
+    --card-surface: rgba(18, 25, 38, 0.75);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --amber-bright: #ffbe3b;
+    --amber-gold: #f59e0b;
+    --amber-glow: rgba(245, 158, 11, 0.28);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 18px;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-deep);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ——— SFONDO: MANICO DI CHITARRA STILIZZATO CON SEGNATASTI ——— */
+  .fretboard-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+    background-image: 
+      /* Tasti orizzontali */
+      repeating-linear-gradient(180deg, transparent 0, transparent 99px, rgba(255,255,255,0.06) 100px),
+      /* Corde verticali */
+      repeating-linear-gradient(90deg, transparent 0, transparent 48px, rgba(255,255,255,0.04) 49px, rgba(255,255,255,0.08) 50px);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 80%);
+  }
+
+  /* Luci ambiente diffuse */
+  .ambient-glow {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(140px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-gold {
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%);
+  }
+  .glow-blue {
+    bottom: -150px;
+    right: 5%;
+    background: radial-gradient(circle, rgba(56, 114, 224, 0.16) 0%, transparent 70%);
+  }
+
+  /* ——— CONTENITORE CENTRALE GLASSMORPHIC ——— */
+  .container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 560px;
+    background: var(--card-surface);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 38px 32px;
+    box-shadow: 
+      0 30px 80px rgba(0, 0, 0, 0.65),
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    animation: fadeIn .8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ——— HEADER ——— */
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber-bright);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+
+  .pulse-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--amber-bright);
+    box-shadow: 0 0 10px var(--amber-gold);
+    position: relative;
+  }
+  .pulse-indicator::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1px solid var(--amber-bright);
+    animation: ping 2s infinite ease-out;
+  }
+  @keyframes ping {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.6); opacity: 0; }
+  }
+
+  h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(34px, 7vw, 44px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    margin-bottom: 12px;
+  }
+
+  .accent-gradient {
+    background: linear-gradient(135deg, #ffe28a 0%, #f59e0b 60%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+  }
+
+  /* ——— LISTA LINK/PULSANTI ——— */
+  .grid-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .menu-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    overflow: hidden;
+  }
+
+  /* Riflesso luce al passaggio del cursore */
+  .menu-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+  .menu-card:hover::before {
+    transform: translateX(100%);
+  }
+
+  .menu-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6), 0 0 25px -8px var(--amber-glow);
+  }
+
+  /* Pulsante Principale in evidenza */
+  .menu-card.featured {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(245, 158, 11, 0.04) 100%);
+    border-color: rgba(245, 158, 11, 0.35);
+  }
+  .menu-card.featured:hover {
+    border-color: rgba(255, 190, 59, 0.7);
+    box-shadow: 0 14px 34px -8px rgba(245, 158, 11, 0.35);
+  }
+
+  /* Icone vettoriali */
+  .icon-wrapper {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--amber-bright);
+    transition: all 0.25s ease;
+  }
+
+  .icon-wrapper svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.8;
+  }
+
+  .menu-card:hover .icon-wrapper {
+    background: var(--amber-gold);
+    border-color: var(--amber-bright);
+    color: #0b0f17;
+    transform: scale(1.05) rotate(-3deg);
+  }
+
+  /* Info testuali */
+  .card-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+
+  .card-title {
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+
+  .card-tag {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+  }
+
+  .menu-card.featured .card-tag {
+    background: rgba(245, 158, 11, 0.22);
+    color: var(--amber-bright);
+  }
+
+  .card-description {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Freccia */
+  .card-arrow {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: transform 0.25s ease, color 0.25s ease;
+  }
+  .card-arrow svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+  .menu-card:hover .card-arrow {
+    transform: translateX(4px);
+    color: var(--amber-bright);
+  }
+
+  /* ——— FOOTER ——— */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Equalizzatore animato ad onda audio */
+  .soundwave {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2.5px;
+    height: 13px;
+  }
+  .soundwave span {
+    width: 2.5px;
+    background: var(--amber-gold);
+    border-radius: 3px;
+    opacity: 0.9;
+    animation: wave 1.2s ease-in-out infinite alternate;
+  }
+  .soundwave span:nth-child(1) { height: 4px; animation-delay: 0.1s; }
+  .soundwave span:nth-child(2) { height: 12px; animation-delay: 0.3s; }
+  .soundwave span:nth-child(3) { height: 7px; animation-delay: 0.5s; }
+  .soundwave span:nth-child(4) { height: 13px; animation-delay: 0.2s; }
+  .soundwave span:nth-child(5) { height: 5px; animation-delay: 0.4s; }
+
+  @keyframes wave {
+    0% { transform: scaleY(0.3); }
+    100% { transform: scaleY(1); }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 28px 20px 24px;
+      border-radius: 22px;
+    }
+    .menu-card {
+      padding: 14px 14px;
+      gap: 12px;
+    }
+    .icon-wrapper {
+      width: 38px;
+      height: 38px;
+    }
+    .card-title {
+      font-size: 14.5px;
+    }
+    .card-description {
+      font-size: 12px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Sfondo chitarristico -->
+  <div class="fretboard-bg" aria-hidden="true"></div>
+  <div class="ambient-glow glow-gold" aria-hidden="true"></div>
+  <div class="ambient-glow glow-blue" aria-hidden="true"></div>
+
+  <main class="container">
+    
+    <!-- Tag superiore -->
+    <div class="header-badge">
+      <span class="pulse-indicator" aria-hidden="true"></span>
+      Musica è Vita
+    </div>
+
+    <!-- Titolo principale -->
+    <h1>Studio <span class="accent-gradient">Chitarra</span></h1>
+    <p class="subtitle">Sintonizzati, accendi il metronomo e scegli il modulo da allenare per la sessione di oggi.</p>
+
+    <!-- Moduli di Studio -->
+    <div class="grid-links">
+
+      
+      <!-- 0. Ditones -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicabenhen/ditones/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Sound waves / Improvvisazione -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Ditones</span>
+            <span class="card-tag">Jam</span>
+          </div>
+          <div class="card-description">Esercitati con i Ditones</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>      
+      <!-- 1. Note casuali (In primo piano) -->
+      <a class="menu-card featured" target="_blank" rel="noopener" href="https://benhen80.github.io/musicabenhen/note/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Fretboard / Note -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Note casuali</span>
+            <span class="card-tag">Tastiera</span>
+          </div>
+          <div class="card-description">Riconoscimento istantaneo delle note sul manico</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- 2. Accordi casuali -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicabenhen/accordi/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Accordi -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Accordi casuali</span>
+            <span class="card-tag">Armonia</span>
+          </div>
+          <div class="card-description">Memorizzazione e cambio forme sulla tastiera</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- 3. Workout Quotidiano -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicabenhen/dashboard/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Workout / Dashboard -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Workout Quotidiano</span>
+            <span class="card-tag">Routine</span>
+          </div>
+          <div class="card-description">Segui la tua scaletta di esercizi su misura</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- 4. Metronomo -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicabenhen/metronomo/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Metronomo / Tempo -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Metronomo</span>
+            <span class="card-tag">Timing</span>
+          </div>
+          <div class="card-description">Allena precisione, timing ritmico e velocità</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+      <!-- 5. Suonare su Accordi -->
+      <a class="menu-card" target="_blank" rel="noopener" href="https://benhen80.github.io/musicabenhen/suonaresuaccordi/index.html">
+        <div class="icon-wrapper" aria-hidden="true">
+          <!-- Icona Sound waves / Improvvisazione -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          </svg>
+        </div>
+        <div class="card-content">
+          <div class="card-top">
+            <span class="card-title">Suonare su Accordi</span>
+            <span class="card-tag">Jam</span>
+          </div>
+          <div class="card-description">Improvvisa e costruisci frasi sulle progressioni</div>
+        </div>
+        <div class="card-arrow" aria-hidden="true">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-left">
+        <span>Pratica quotidiana</span>
+      </div>
+      <div class="soundwave" aria-label="Audio attivo" title="Audio attivo">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </footer>
+
+  </main>
+
+</body>
+</html>

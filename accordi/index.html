@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Accordi Casuali</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#0f1624;--card:#1b2336;--field:#121a2a;--ink:#f2f5fb;--mute:#8fa3c7;--acc:#e8a23b;--accink:#1a1306;--dot:#5b7fd1;--wood:#232d45;--line:#3a4766;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef1f7;--card:#fff;--field:#eef1f7;--ink:#17202f;--mute:#5b6b8a;--acc:#c77d0a;--accink:#fff;--dot:#3d62b8;--wood:#e4e9f4;--line:#9aa8c6;color-scheme:light}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:0 0 40px}
+.hero{background:var(--card);border-left:4px solid var(--acc);border-radius:0 0 18px 0;padding:20px 20px 16px}
+h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:2.4rem;letter-spacing:.02em;text-transform:uppercase;color:var(--acc);margin:0 0 8px}
+.hero p{margin:0;color:var(--mute);font-size:1.05rem;line-height:1.45}
+.card{background:var(--card);border-radius:18px;padding:18px;margin:14px 0 0}
+h2{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:0 0 12px;font-weight:700}
+.fields{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:.78rem;font-weight:600;color:var(--mute)}
+input[type=number]{width:96px;background:var(--field);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:700 1.1rem Inter,sans-serif;padding:11px 12px}
+select{background:var(--field);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:600 1rem Inter,sans-serif;padding:11px 12px;min-width:160px}
+.hint{color:var(--mute);font-size:.82rem;margin:-4px 0 10px}
+.gt{width:100%;display:flex;align-items:center;gap:10px;font-size:.78rem;font-weight:600;color:var(--mute);margin-top:8px}
+.gt button{height:26px;padding:0 10px;font-size:.66rem}
+.pill{display:flex;align-items:center;gap:10px;background:var(--field);border-radius:12px;padding:0 18px;height:44px;font-size:1rem;cursor:pointer;user-select:none}
+.pill input{width:19px;height:19px;accent-color:var(--acc)}
+.types{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.types .pill{height:36px;padding:0 12px;font-size:.88rem;gap:7px}
+.types .pill input{width:16px;height:16px}
+.btns{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+button{font:700 .9rem Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;border:0;border-radius:12px;padding:0 22px;height:42px;cursor:pointer;background:var(--field);color:var(--ink)}
+button.go{background:var(--acc);color:var(--accink)}
+button:disabled{opacity:.45;cursor:default}
+.stage{min-height:480px;display:flex;flex-direction:column;align-items:center;text-align:center}
+#status{font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+#body{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:8px 0}
+#ph{width:56px;height:26px;background:var(--line);border-radius:3px;opacity:.6}
+#cname{font-family:Anton,Impact,sans-serif;font-size:clamp(3.6rem,15vw,6.4rem);line-height:1;letter-spacing:.02em}
+#csub{color:var(--mute);font-size:1.05rem;margin-top:-4px}
+.neck{width:100%;overflow-x:auto}
+.neck svg{display:block;min-width:620px;width:100%;height:auto}
+.info{color:var(--mute);font-size:.98rem;line-height:1.6;max-width:640px}
+.info b{color:var(--ink);font-weight:600}
+.track{width:min(420px,70%);height:8px;border-radius:4px;background:var(--field);margin-top:10px;overflow:hidden}
+#bar{height:100%;width:100%;background:var(--acc);border-radius:4px}
+</style>
+</head>
+<body>
+<main>
+<div class="hero">
+  <h1>Accordi casuali</h1>
+  <p>Scegli quanti accordi eseguire e premi Submit. Compare il nome dell’accordo e hai il tempo impostato per trovarlo sul manico: scaduto il tempo, vedi come si prende, poi si passa al successivo.</p>
+</div>
+
+<div class="card">
+  <h2>Impostazioni</h2>
+  <div class="fields">
+    <label class="f">Numero di accordi<input type="number" id="n" value="10" min="1" max="200"></label>
+    <label class="f">Secondi per accordo<input type="number" id="s" value="10" min="2" max="120"></label>
+    <label class="f">Secondi soluzione<input type="number" id="rev" value="6" min="2" max="60"></label>
+    <label class="pill"><input type="checkbox" id="sharp"> Diesis ♯</label>
+    <label class="pill"><input type="checkbox" id="flat"> Bemolle ♭</label>
+    <label class="pill"><input type="checkbox" id="snd" checked> Suono</label>
+    <label class="pill"><input type="checkbox" id="str" checked> Corda</label>
+    <label class="pill"><input type="checkbox" id="ang"> Notazione anglosassone</label>
+  </div>
+  <h2 style="margin:18px 0 6px">Accordi</h2>
+  <div class="types" id="types"></div>
+  <h2 style="margin:20px 0 10px">Scale</h2>
+  <p class="hint">Gli accordi vengono estratti dalle scale selezionate. Senza nessuna scala selezionata escono accordi liberi.</p>
+  <div class="types" id="scales" style="margin-top:0"></div>
+  <div class="fields" style="margin-top:12px"><label class="f">Tonalità<select id="key"></select></label></div>
+  <h2 style="margin:20px 0 10px">Rivolti</h2>
+  <div class="types"><label class="pill"><input type="checkbox" id="inv0" checked> Fondamentale (tonica al basso)</label><label class="pill"><input type="checkbox" id="inv1" checked> 1° rivolto</label><label class="pill"><input type="checkbox" id="inv2" checked> 2° rivolto</label><label class="pill"><input type="checkbox" id="inv3" checked> 3° rivolto</label></div>
+  <div class="btns">
+    <button class="go" id="submit">Submit</button>
+    <button id="pause" disabled>Pausa</button>
+    <button id="stop" disabled>Stop</button>
+  </div>
+</div>
+
+<div class="card stage">
+  <div id="status">Pronto</div>
+  <div id="body"><div id="ph"></div></div>
+  <div class="track"><div id="bar"></div></div>
+</div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const TUN=[4,9,2,7,11,4], OPENF=[82.41,110,146.83,196,246.94,329.63];
+const NS=["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"],NF=["C","D♭","D","E♭","E","F","G♭","G","A♭","A","B♭","B"];
+const IS=["Do","Do♯","Re","Re♯","Mi","Fa","Fa♯","Sol","Sol♯","La","La♯","Si"],IF=["Do","Re♭","Re","Mi♭","Mi","Fa","Sol♭","Sol","La♭","La","Si♭","Si"];
+const nm=(pc,fl)=>($("ang").checked?(fl?NF:NS):(fl?IF:IS))[pc];
+// ortografia corretta (♯/♭) in base alle note dell’accordo
+const LN=["C","D","E","F","G","A","B"],LI=["Do","Re","Mi","Fa","Sol","La","Si"],NAT=[0,2,4,5,7,9,11];
+const AC={"-2":"♭♭","-1":"♭","0":"","1":"♯","2":"♯♯"};
+const sp=(l,a)=>($("ang").checked?LN:LI)[l]+(AC[a]||"");
+const nmc=(c,pc)=>sp(c.sp[pc].l,c.sp[pc].a);
+function spellAt(l,pc,semi,steps){const L=(l+steps)%7,t=(pc+semi)%12;let d=(((t-NAT[L])%12)+12)%12;if(d>6)d-=12;return{l:L,a:d}}
+const rootInfo=(pc,fl)=>{const s=(fl?NF:NS)[pc];return{l:LN.indexOf(s[0]),a:s.length>1?(s[1]==="♯"?1:-1):0}};
+const KMAJ=["C","D♭","D","E♭","E","F","F♯","G","A♭","A","B♭","B"],KMIN=["C","C♯","D","E♭","E","F","F♯","G","G♯","A","B♭","B"];
+const kinfo=(pc,min)=>{const s=(min?KMIN:KMAJ)[pc];return{l:LN.indexOf(s[0]),a:s.length>1?(s[1]==="♯"?1:-1):0}};
+const keyName=(pc,min)=>{const k=kinfo(pc,min);return sp(k.l,k.a)};
+const STEPS={maj:[0,2,4],m:[0,2,4],"7":[0,2,4,6],maj7:[0,2,4,6],m7:[0,2,4,6],m7b5:[0,2,4,6],dim:[0,2,4],dim7:[0,2,4,6],aug:[0,2,4],sus2:[0,1,4],sus4:[0,3,4],"6":[0,2,4,5],m6:[0,2,4,5],"9":[0,2,4,6,1],add9:[0,2,4,1],mmaj7:[0,2,4,6],"7sus4":[0,3,4,6],maj9:[0,2,4,6,1],m9:[0,2,4,6,1],"69":[0,2,4,5,1],"7b9":[0,2,4,6,1],"7#9":[0,2,4,6,1],"7#5":[0,2,4,6],"7b5":[0,2,4,6],madd9:[0,2,4,1]};
+const SC={
+ maggiore:{name:"maggiore",minor:false,semi:[0,2,4,5,7,9,11],num:["I","ii","iii","IV","V","vi","vii°"],ch:[["maj","maj7","6","add9","sus2","sus4","maj9","69"],["m","m7","m6","sus4","m9"],["m","m7"],["maj","maj7","6","add9","sus2","maj9"],["maj","7","9","sus4","7sus4"],["m","m7","m9"],["dim","m7b5"]]},
+ minore:{name:"minore naturale",minor:true,semi:[0,2,3,5,7,8,10],num:["i","ii°","III","iv","v","VI","VII"],ch:[["m","m7","sus2","sus4","m9","madd9"],["dim","m7b5"],["maj","maj7","add9","maj9"],["m","m7","m9","madd9"],["m","m7"],["maj","maj7","add9","maj9"],["maj","7"]]},
+ armonica:{name:"minore armonica",minor:true,semi:[0,2,3,5,7,8,11],num:["i","ii°","III+","iv","V","VI","vii°"],ch:[["m","mmaj7"],["dim","m7b5"],["aug"],["m","m7"],["maj","7","9","7b9","7#9","7#5"],["maj","maj7"],["dim","dim7"]]},
+ melodica:{name:"minore melodica",minor:true,semi:[0,2,3,5,7,9,11],num:["i","ii","III+","IV","V","vi°","vii°"],ch:[["m","m6","mmaj7"],["m","m7"],["aug"],["maj","7"],["maj","7","9"],["dim","m7b5"],["dim","m7b5"]]}
+};
+const T3=["tonica","terza","quinta"],T4=[...T3,"settima"];
+const ROLES={maj:T3,m:T3,"7":T4,maj7:T4,m7:T4,m7b5:T4,dim:T3,dim7:T4,aug:T3,sus2:["tonica","seconda","quinta"],sus4:["tonica","quarta","quinta"],"6":[...T3,"sesta"],m6:[...T3,"sesta"],"9":[...T4,"nona"],add9:[...T3,"nona"],mmaj7:T4,"7sus4":["tonica","quarta","quinta","settima"],maj9:[...T4,"nona"],m9:[...T4,"nona"],"69":[...T3,"sesta","nona"],"7b9":[...T4,"nona"],"7#9":[...T4,"nona"],"7#5":T4,"7b5":T4,madd9:[...T3,"nona"]};
+const INVN=["posizione fondamentale","1° rivolto","2° rivolto","3° rivolto"];
+const invMax=t=>(t.k.includes("add9")||t.iv.length<4)?2:3;
+function pickV(pc,type){
+  const al=[0,1,2,3].filter(i=>$("inv"+i).checked&&i<=invMax(type));
+  while(al.length){
+    const j=Math.random()*al.length|0,inv=al[j],wins=voicings(pc,type,inv),ks=Object.keys(wins);
+    if(ks.length){const w=+ks[Math.random()*ks.length|0],l=wins[w];return{inv,win:w,v:l[Math.random()*l.length|0]}}
+    al.splice(j,1);
+  }
+  return null;
+}
+function deco(c,l,a,sc){c.l=l;c.a=a;c.sc=sc;c.sp={};c.type.iv.forEach((iv,j)=>{c.sp[(c.root+iv)%12]=spellAt(l,c.root,iv,STEPS[c.type.k][j])});return c}
+function makeChord(){
+  const sel=[...document.querySelectorAll("#scales [data-s]:checked")].map(e=>e.dataset.s);
+  if(!sel.length){const c=makeChordOld();if(c){const r=rootInfo(c.root,c.fl);deco(c,r.l,r.a,null)}return c}
+  const types=TYPES.filter(t=>document.querySelector(`[data-k="${t.k}"]`).checked);
+  if(!types.length) return null;
+  const sh=$("sharp").checked,fl=$("flat").checked,kv=+$("key").value;
+  for(let t=0;t<40;t++){
+    const S=SC[sel[Math.random()*sel.length|0]];
+    let tp=kv;
+    if(kv<0){const ps=[];for(let p=0;p<12;p++){const k=kinfo(p,S.minor);if(k.a===0||(k.a>0&&sh)||(k.a<0&&fl))ps.push(p)}tp=ps[Math.random()*ps.length|0]}
+    const tk=kinfo(tp,S.minor),d=Math.random()*7|0;
+    const okT=S.ch[d].map(k=>types.find(x=>x.k===k)).filter(Boolean);
+    if(!okT.length) continue;
+    const type=okT[Math.random()*okT.length|0],pc=(tp+S.semi[d])%12,r=spellAt(tk.l,tp,S.semi[d],d);
+    const pv=pickV(pc,type); if(!pv) continue;
+    const c={root:pc,type,v:pv.v,win:pv.win,inv:pv.inv};
+    const key=c.root+c.type.k+c.v.join()+c.inv;
+    if(key===last&&t<30) continue;
+    last=key;
+    return deco(c,r.l,r.a,{scale:`${keyName(tp,S.minor)} ${S.name}`,deg:S.num[d]});
+  }
+  return null;
+}
+const TYPES=[
+ {k:"maj",suf:"",name:"maggiore",iv:[0,4,7]},
+ {k:"m",suf:"m",name:"minore",iv:[0,3,7]},
+ {k:"7",suf:"7",name:"settima di dominante",iv:[0,4,7,10]},
+ {k:"maj7",suf:"maj7",name:"settima maggiore",iv:[0,4,7,11]},
+ {k:"m7",suf:"m7",name:"minore settima",iv:[0,3,7,10]},
+ {k:"m7b5",suf:"m7♭5",name:"semidiminuito",iv:[0,3,6,10]},
+ {k:"dim",suf:"dim",name:"diminuito",iv:[0,3,6]},
+ {k:"dim7",suf:"dim7",name:"diminuito settima",iv:[0,3,6,9]},
+ {k:"aug",suf:"aug",name:"aumentato",iv:[0,4,8]},
+ {k:"sus2",suf:"sus2",name:"sospeso 2",iv:[0,2,7]},
+ {k:"sus4",suf:"sus4",name:"sospeso 4",iv:[0,5,7]},
+ {k:"6",suf:"6",name:"sesta",iv:[0,4,7,9]},
+ {k:"m6",suf:"m6",name:"minore sesta",iv:[0,3,7,9]},
+ {k:"9",suf:"9",name:"nona di dominante",iv:[0,4,7,10,2]},
+ {k:"add9",suf:"add9",name:"aggiunta nona",iv:[0,4,7,2]},
+ {k:"mmaj7",suf:"m(maj7)",name:"minore settima maggiore",iv:[0,3,7,11]},
+ {k:"7sus4",suf:"7sus4",name:"settima sospesa",iv:[0,5,7,10]},
+ {k:"maj9",suf:"maj9",name:"nona maggiore",iv:[0,4,7,11,2]},
+ {k:"m9",suf:"m9",name:"minore nona",iv:[0,3,7,10,2]},
+ {k:"69",suf:"6/9",name:"sesta nona",iv:[0,4,7,9,2]},
+ {k:"7b9",suf:"7♭9",name:"settima ♭9",iv:[0,4,7,10,1]},
+ {k:"7#9",suf:"7♯9",name:"settima ♯9",iv:[0,4,7,10,3]},
+ {k:"7#5",suf:"7♯5",name:"settima ♯5",iv:[0,4,8,10]},
+ {k:"7b5",suf:"7♭5",name:"settima ♭5",iv:[0,4,6,10]},
+ {k:"madd9",suf:"madd9",name:"minore aggiunta nona",iv:[0,3,7,2]}
+];
+// scale in cui l’accordo compare: [scala, semitoni dalla tonica alla fondamentale, grado]
+const USE={
+ maj:[["maggiore",0,"I"],["maggiore",5,"IV"],["maggiore",7,"V"],["minore",3,"III"],["minore",8,"VI"],["minore",10,"VII"]],
+ m:[["maggiore",2,"ii"],["maggiore",4,"iii"],["maggiore",9,"vi"],["minore",0,"i"],["minore",5,"iv"],["minore",7,"v"]],
+ "7":[["maggiore",7,"V7"],["minore armonica",7,"V7"],["minore",10,"VII7"]],
+ maj7:[["maggiore",0,"Imaj7"],["maggiore",5,"IVmaj7"],["minore",3,"IIImaj7"],["minore",8,"VImaj7"]],
+ m7:[["maggiore",2,"iim7"],["maggiore",4,"iiim7"],["maggiore",9,"vim7"],["minore",0,"im7"],["minore",5,"ivm7"],["minore",7,"vm7"]],
+ m7b5:[["maggiore",11,"viiø"],["minore",2,"iiø"]],
+ dim:[["maggiore",11,"vii°"],["minore",2,"ii°"]],
+ dim7:[["minore armonica",11,"vii°7"]],
+ aug:[["minore armonica",3,"III+"]],
+ sus2:[["maggiore",0,"Isus2"],["maggiore",5,"IVsus2"],["maggiore",7,"Vsus2"]],
+ sus4:[["maggiore",0,"Isus4"],["maggiore",7,"Vsus4"],["maggiore",2,"iisus4"]],
+ "6":[["maggiore",0,"I6"],["maggiore",5,"IV6"]],
+ m6:[["minore melodica",0,"i6"],["maggiore",2,"ii6 (dorico)"]],
+ "9":[["maggiore",7,"V9"],["minore armonica",7,"V9"]],
+ add9:[["maggiore",0,"Iadd9"],["maggiore",5,"IVadd9"],["maggiore",7,"Vadd9"]],
+ mmaj7:[["minore armonica",0,"imMaj7"],["minore melodica",0,"imMaj7"]],
+ "7sus4":[["maggiore",7,"V7sus4"]],
+ maj9:[["maggiore",0,"Imaj9"],["maggiore",5,"IVmaj9"]],
+ m9:[["maggiore",2,"iim9"],["maggiore",9,"vim9"],["minore",0,"im9"]],
+ "69":[["maggiore",0,"I6/9"],["maggiore",5,"IV6/9"]],
+ "7b9":[["minore armonica",7,"V7♭9"]],
+ "7#9":[["minore armonica",7,"V7♯9 (alterato)"]],
+ "7#5":[["maggiore",7,"V7♯5 (alterato)"],["minore armonica",7,"V7♯5"]],
+ "7b5":[["maggiore",7,"V7♭5 (alterato)"]],
+ madd9:[["minore",0,"imadd9"],["minore",5,"ivmadd9"]]
+};
+// elenco tipi
+const GR=[["3 voci · triadi",["maj","m","dim","aug"],1],["4 voci · quadriadi",["7","maj7","m7","m7b5","dim7","mmaj7"],1],["Abbellimenti",["sus2","sus4","6","m6","9","add9","madd9","7sus4","maj9","m9","69","7b9","7#9","7#5","7b5"],0]];
+$("types").innerHTML=GR.map(([t,ks,on],gi)=>`<div class="gt">${t}<button type="button" data-gb="${gi}">Tutti / nessuno</button></div>`+ks.map(k=>{const ty=TYPES.find(x=>x.k===k);return `<label class="pill"><input type="checkbox" data-k="${k}" data-g="${gi}"${on?" checked":""}> ${k==="m"?"minore (m)":(ty.suf||"maggiore")}</label>`}).join("")).join("");
+document.querySelectorAll("[data-gb]").forEach(b=>b.onclick=()=>{const bx=[...document.querySelectorAll(`[data-g="${b.dataset.gb}"]`)],all=bx.every(x=>x.checked);bx.forEach(x=>x.checked=!all)});
+
+$("scales").innerHTML=Object.keys(SC).map(k=>`<label class="pill"><input type="checkbox" data-s="${k}" checked> ${SC[k].name[0].toUpperCase()+SC[k].name.slice(1)}</label>`).join("")+`<button type="button" id="allsc" style="height:36px;padding:0 14px;font-size:.78rem">Tutte</button>`;
+$("allsc").onclick=()=>document.querySelectorAll("#scales [data-s]").forEach(e=>e.checked=true);
+function buildKeys(){const it=!$("ang").checked,s=it?IS:NS,f=it?IF:NF,cur=$("key").value||"-1";$("key").innerHTML='<option value="-1">Tutte</option>'+s.map((n,p)=>`<option value="${p}">${n}${f[p]!==n?" / "+f[p]:""}</option>`).join("");$("key").value=cur}
+buildKeys();$("ang").addEventListener("change",buildKeys);
+
+// genera tutte le diteggiature (finestre di 4 tasti, 0–15) per una fondamentale e un tipo
+const cache={};
+function voicings(root,type,inv=0){
+  const key=root+"|"+type.k+"|"+inv; if(cache[key]) return cache[key];
+  const bass=(root+type.iv[inv])%12;
+  const P=new Set(type.iv.map(i=>(root+i)%12)), req=new Set(P);
+  if(type.iv.length>=4&&type.iv.includes(7)&&bass!==(root+7)%12) req.delete((root+7)%12);
+  const wins={};
+  for(let s=0;s<=12;s++){
+    const opts=TUN.map((t,i)=>{const a=[null];for(let f=(s===0?0:s);f<=(s===0?4:s+3);f++) if(P.has((t+f)%12)) a.push(f);return a});
+    const res=[], cur=[];
+    (function rec(i){
+      if(i===6){ if(ok(cur,s,bass,req)) res.push(cur.slice()); return }
+      for(const o of opts[i]){cur[i]=o;rec(i+1)}
+    })(0);
+    if(res.length) wins[s]=res;
+  }
+  return cache[key]=wins;
+}
+function ok(v,s,bass,req){
+  const pl=v.map((f,i)=>f===null?-1:i).filter(i=>i>=0);
+  if(pl.length<4||pl[0]>2) return false;
+  if(pl[pl.length-1]-pl[0]+1!==pl.length) return false;
+  if((TUN[pl[0]]+v[pl[0]])%12!==bass) return false;
+  const got=new Set(pl.map(i=>(TUN[i]+v[i])%12));
+  for(const r of req) if(!got.has(r)) return false;
+  const fr=v.filter(f=>f>0);
+  if(s===0){ if(!v.includes(0)) return false }
+  else { if(!fr.length||Math.min(...fr)!==s) return false }
+  if(fr.length){const m=Math.min(...fr),c=fr.filter(f=>f===m).length;
+    if(fr.length-(c>=2?c-1:0)>4) return false}
+  return true;
+}
+// pool di fondamentali
+function pool(){
+  const sh=$("sharp").checked, fl=$("flat").checked, p=[];
+  [0,2,4,5,7,9,11].forEach(pc=>p.push({pc,fl:fl&&!sh}));
+  if(sh)[1,3,6,8,10].forEach(pc=>p.push({pc,fl:false}));
+  if(fl)[1,3,6,8,10].forEach(pc=>p.push({pc,fl:true}));
+  return p;
+}
+let last="";
+function makeChordOld(){
+  const types=TYPES.filter(t=>document.querySelector(`[data-k="${t.k}"]`).checked);
+  if(!types.length) return null;
+  const rp=pool(); let c,tries=0;
+  do{
+    const r=rp[Math.random()*rp.length|0], type=types[Math.random()*types.length|0];
+    const pv=pickV(r.pc,type); tries++; if(!pv) continue;
+    
+    c={root:r.pc,fl:r.fl,type,v:pv.v,win:pv.win,inv:pv.inv};
+    tries++;
+  }while((!c||c.root+c.type.k+c.v.join()+c.inv===last)&&tries<30);
+  if(!c) return null;
+  last=c.root+c.type.k+c.v.join()+c.inv;
+  return c;
+}
+// disegno manico
+function neck(c){
+  const W=760,H=212,nx=48,ex=744,L=(ex-nx)/(1-2**(-15/12));
+  const fx=n=>nx+L*(1-2**(-n/12)), cxf=n=>(fx(n-1)+fx(n))/2, sy=i=>34+(5-i)*24, ox=nx-20;
+  const rootPc=c.root; let o="";
+  o+=`<rect x="${nx}" y="20" width="${ex-nx}" height="148" rx="4" fill="var(--wood)"/>`;
+  const a=c.win===0?nx:fx(c.win-1), b=fx(c.win===0?4:c.win+3);
+  o+=`<rect x="${a}" y="20" width="${b-a}" height="148" fill="var(--acc)" opacity=".12"/>`;
+  [3,5,7,9,15].forEach(n=>o+=`<circle cx="${cxf(n)}" cy="94" r="5" fill="var(--line)" opacity=".7"/>`);
+  o+=`<circle cx="${cxf(12)}" cy="70" r="5" fill="var(--line)" opacity=".7"/><circle cx="${cxf(12)}" cy="118" r="5" fill="var(--line)" opacity=".7"/>`;
+  for(let n=0;n<=15;n++){
+    o+=`<line x1="${fx(n)}" x2="${fx(n)}" y1="20" y2="168" stroke="${n?"var(--line)":"var(--ink)"}" stroke-width="${n?1.5:5}"/>`;
+    if(n) o+=`<text x="${cxf(n)}" y="192" text-anchor="middle" font-size="11" fill="var(--mute)">${n}</text>`;
+  }
+  for(let i=0;i<6;i++) o+=`<line x1="${nx}" x2="${ex}" y1="${sy(i)}" y2="${sy(i)}" stroke="var(--mute)" stroke-width="${2.6-i*.3}"/>`;
+  const fr=c.v.filter(f=>f>0), m=fr.length?Math.min(...fr):0;
+  if(m){
+    const idx=c.v.map((f,i)=>f===m?i:-1).filter(i=>i>=0);
+    const between=c.v.slice(idx[0],idx[idx.length-1]+1).some(f=>f===0);
+    if(idx.length>=2&&!between) o+=`<rect x="${cxf(m)-12}" y="${sy(idx[idx.length-1])-12}" width="24" height="${sy(idx[0])-sy(idx[idx.length-1])+24}" rx="12" fill="var(--acc)" opacity=".35"/>`;
+  }
+  c.v.forEach((f,i)=>{
+    const y=sy(i);
+    if(f===null) o+=`<text x="${ox}" y="${y+6}" text-anchor="middle" font-size="18" fill="var(--mute)">×</text>`;
+    else{
+      const pc=(TUN[i]+f)%12, isR=pc===rootPc, x=f===0?ox:cxf(f);
+      const fill=isR?"var(--acc)":"var(--dot)", tc=isR?"var(--accink)":"#fff";
+      if(f===0) o+=`<circle cx="${x}" cy="${y}" r="11" fill="${isR?"var(--acc)":"var(--card)"}" stroke="${isR?"var(--acc)":"var(--dot)"}" stroke-width="2"/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="9" font-weight="700" fill="${isR?"var(--accink)":"var(--ink)"}">${nmc(c,pc)}</text>`;
+      else o+=`<circle cx="${x}" cy="${y}" r="11" fill="${fill}"/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="9" font-weight="700" fill="${tc}">${nmc(c,pc)}</text>`;
+    }
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Accordo sul manico della chitarra">${o}</svg>`;
+}
+function usage(c){
+  const list=USE[c.type.k].slice(0,5).map(([sc,semi,deg])=>`<b>${keyName((c.root-semi+12)%12,sc.includes("minore"))} ${sc}</b> (${deg})`);
+  return list.join(" · ");
+}
+function render(c,sol){
+  const rn=sp(c.l,c.a);
+  const got=new Set(c.v.map((f,i)=>f===null?null:(TUN[i]+f)%12));
+  const names=c.type.iv.map(i=>(c.root+i)%12).filter(p=>got.has(p)).map(p=>nmc(c,p));
+  const bass=c.v.findIndex(f=>f!==null);
+  const bs=c.v.findIndex(f=>f!==null),inv=c.inv||0,bpc=(c.root+c.type.iv[inv])%12,bl=inv?`${inv}° rivolto · ${ROLES[c.type.k][inv]}`:"tonica";
+  $("body").innerHTML=
+   `<div id="cname">${rn}${c.type.suf}</div>
+    <div id="csub">${rn} ${c.type.name} · ${INVN[inv]}${inv?` (basso ${nmc(c,bpc)})`:""}</div>
+    ${sol?`<div class="neck">${neck(c)}</div>`:""}
+    <div class="info">Nota più grave: <b>${bl}</b> (${nmc(c,bpc)})${sol?`, <b>${6-bs}ª corda, tasto ${c.v[bs]}</b>`:($("str").checked?` sulla <b>${6-bs}ª corda</b>`:"")}<br>${sol?`Note: <b>${names.join(" · ")}</b><br>`:""}${c.sc?`Scala: <b>${c.sc.scale}</b> (grado ${c.sc.deg})`:""}${sol?`<br>${c.sc?"Si usa anche in:":"Si usa in:"} ${usage(c)}`:""}`+
+    ""+`</div>`;
+}
+// suono
+let ctx;
+function strum(v){
+  if(!$("snd").checked) return;
+  ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+  const t=ctx.currentTime, pl=v.map((f,i)=>f===null?-1:i).filter(i=>i>=0);
+  pl.forEach((i,k)=>{
+    const fq=OPENF[i]*2**(v[i]/12), st=t+k*0.045, g=ctx.createGain();
+    g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(0.22/Math.sqrt(pl.length),st+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0005,st+1.8);g.connect(ctx.destination);
+    [["triangle",1,1],["sine",2,.35]].forEach(([ty,mul,vol])=>{
+      const os=ctx.createOscillator(),gg=ctx.createGain();os.type=ty;os.frequency.value=fq*mul;gg.gain.value=vol;
+      os.connect(gg);gg.connect(g);os.start(st);os.stop(st+1.9);
+    });
+  });
+}
+// sequenza
+let run=null,raf=0;
+function setBtns(active){$("pause").disabled=!active;$("stop").disabled=!active;$("submit").disabled=active}
+function setStat(){$("status").textContent=`Accordo ${run.i} di ${run.total} · ${run.ph?"Come si prende":"Trova l’accordo"}`}
+function beep(){if(!$("snd").checked)return;ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();const t=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+.2)}
+function reveal(now){run.ph=1;run.t0=now;run.dur=run.d1;render(run.cur,true);strum(run.cur.v);setStat()}
+function nextChord(now){
+  if(run.i>=run.total){ finish(); return }
+  const c=makeChord();
+  if(!c){finish();$("status").textContent="Nessun accordo disponibile con queste impostazioni";return}
+  run.i++; run.t0=now; run.cur=c;
+  run.ph=0; run.dur=run.d0; render(c,false); beep(); setStat();
+}
+function finish(){
+  cancelAnimationFrame(raf); run=null; setBtns(false);
+  $("status").textContent="Finito"; $("bar").style.width="0%"; $("pause").textContent="Pausa";
+}
+function loop(now){
+  if(!run) return;
+  if(!run.paused){
+    const p=(now-run.t0)/run.dur;
+    $("bar").style.width=Math.max(0,(1-p)*100)+"%";
+    if(p>=1){ if(run.ph===0) reveal(now); else nextChord(now); }
+  }
+  if(run) raf=requestAnimationFrame(loop);
+}
+$("submit").onclick=()=>{
+  if(!document.querySelector("#types input:checked")){$("status").textContent="Seleziona almeno un tipo di accordo";return}
+  const total=Math.max(1,Math.min(200,+$("n").value||10)), dur=Math.max(2,Math.min(120,+$("s").value||10))*1000;
+  if($("snd").checked){ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();ctx.resume&&ctx.resume()}
+  run={i:0,total,d0:dur,d1:Math.max(2,Math.min(60,+$("rev").value||6))*1000,dur,paused:false,t0:0,ph:0}; last="";
+  setBtns(true); nextChord(performance.now()); raf=requestAnimationFrame(loop);
+};
+$("pause").onclick=()=>{
+  if(!run) return;
+  if(!run.paused){run.paused=true;run.pt=performance.now();$("pause").textContent="Riprendi";$("status").textContent+=" · in pausa"}
+  else{run.paused=false;run.t0+=performance.now()-run.pt;$("pause").textContent="Pausa";setStat()}
+};
+$("stop").onclick=()=>{
+  cancelAnimationFrame(raf); run=null; setBtns(false);
+  $("status").textContent="Pronto"; $("bar").style.width="100%"; $("pause").textContent="Pausa";
+  $("body").innerHTML='<div id="ph"></div>';
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Rig — Metronomo &amp; Timer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wood-dark: #1c140e;
+    --wood-panel: #2b1d14;
+    --wood-panel-light: #372619;
+    --brass: #c9a227;
+    --brass-dim: #8a721f;
+    --cream: #ede0c8;
+    --muted: #a89478;
+    --tube-red: #c1443b;
+    --amp-green: #4f7a5b;
+    --amp-green-bright: #6fa87e;
+    --line: rgba(237,224,200,0.12);
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(201,162,39,0.07), transparent 45%),
+      radial-gradient(ellipse at 100% 100%, rgba(79,122,91,0.06), transparent 50%),
+      var(--wood-dark);
+    background-image:
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.15) 0px, transparent 2px, transparent 90px, rgba(0,0,0,0.1) 92px),
+      radial-gradient(ellipse at 20% -10%, rgba(201,162,39,0.07), transparent 45%),
+      radial-gradient(ellipse at 100% 100%, rgba(79,122,91,0.06), transparent 50%),
+      var(--wood-dark);
+    color:var(--cream);
+    font-family:'Work Sans', sans-serif;
+    padding:32px 20px 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .rig{
+    max-width:1080px;
+    margin:0 auto;
+  }
+
+  header.rig-header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:28px;
+    padding-bottom:18px;
+    border-bottom:1px solid var(--line);
+  }
+
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+  }
+
+  .brand .badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    color:var(--wood-dark);
+    background:var(--brass);
+    padding:3px 8px;
+    border-radius:3px;
+    font-weight:700;
+  }
+
+  h1{
+    font-family:'Oswald', sans-serif;
+    font-weight:600;
+    font-size:28px;
+    letter-spacing:0.02em;
+    margin:0;
+    text-transform:uppercase;
+  }
+
+  .subtitle{
+    font-size:13px;
+    color:var(--muted);
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  .panels{
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:22px;
+  }
+
+  @media (max-width: 820px){
+    .panels{ grid-template-columns:1fr; }
+  }
+
+  .panel{
+    background:linear-gradient(180deg, var(--wood-panel-light), var(--wood-panel));
+    border:1px solid rgba(0,0,0,0.4);
+    border-radius:10px;
+    padding:18px 18px 16px;
+    position:relative;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.04),
+      0 12px 30px rgba(0,0,0,0.35);
+  }
+
+  .panel::before, .panel::after,
+  .panel .screw-tr, .panel .screw-bl{
+    content:"";
+    position:absolute;
+    width:8px; height:8px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #7a6a4a, #2a2013 70%);
+    box-shadow:0 1px 1px rgba(0,0,0,0.6);
+  }
+  .panel::before{ top:12px; left:12px; }
+  .panel::after{ bottom:12px; right:12px; }
+  .panel .screw-tr{ top:12px; right:12px; }
+  .panel .screw-bl{ bottom:12px; left:12px; }
+
+  .panel-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.16em;
+    color:var(--muted);
+    text-transform:uppercase;
+    margin-bottom:18px;
+  }
+
+  /* ---------- METRONOME ---------- */
+
+  .metro-stage{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    margin-bottom:10px;
+  }
+
+  .pendulum-box{
+    width:128px;
+    height:120px;
+    position:relative;
+    margin-bottom:2px;
+  }
+
+  .pendulum-arm{
+    position:absolute;
+    left:50%;
+    bottom:0;
+    width:3px;
+    height:104px;
+    background:linear-gradient(180deg, var(--brass), var(--brass-dim));
+    transform-origin:bottom center;
+    transform:translateX(-50%) rotate(0deg);
+    border-radius:2px;
+  }
+  .pendulum-arm .bob{
+    position:absolute;
+    top:12px;
+    left:50%;
+    width:13px; height:13px;
+    background:radial-gradient(circle at 35% 30%, #e6cf7a, var(--brass) 60%, var(--brass-dim));
+    border-radius:50%;
+    transform:translateX(-50%);
+    box-shadow:0 0 8px rgba(201,162,39,0.5);
+  }
+  .pendulum-base{
+    position:absolute;
+    bottom:-4px; left:50%;
+    transform:translateX(-50%);
+    width:48px; height:8px;
+    background:linear-gradient(180deg, #4a3520, #241a10);
+    border-radius:4px;
+  }
+
+  .bpm-readout{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .bpm-num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:40px;
+    font-weight:700;
+    line-height:1;
+    color:var(--cream);
+    width:112px;
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+    background:transparent;
+    border:none;
+    border-bottom:2px solid transparent;
+    padding:0 2px;
+    -moz-appearance:textfield;
+  }
+  .bpm-num::-webkit-inner-spin-button,
+  .bpm-num::-webkit-outer-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+  .bpm-num:hover, .bpm-num:focus{
+    border-bottom-color:rgba(201,162,39,0.4);
+    outline:none;
+  }
+  .bpm-unit{
+    font-size:13px;
+    color:var(--muted);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  .bpm-slider{
+    width:100%;
+    margin:18px 0 8px;
+    -webkit-appearance:none;
+    appearance:none;
+    height:4px;
+    border-radius:2px;
+    background:linear-gradient(90deg, var(--brass) 0%, var(--brass) var(--fill,50%), rgba(237,224,200,0.14) var(--fill,50%));
+    outline:none;
+  }
+  .bpm-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:18px; height:18px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f0dd90, var(--brass));
+    border:2px solid #241a10;
+    cursor:pointer;
+    box-shadow:0 1px 4px rgba(0,0,0,0.5);
+  }
+  .bpm-slider::-moz-range-thumb{
+    width:18px; height:18px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f0dd90, var(--brass));
+    border:2px solid #241a10;
+    cursor:pointer;
+  }
+
+  .row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  .row.controls{
+    margin-top:16px;
+    justify-content:space-between;
+  }
+
+  button{
+    font-family:'Work Sans', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    border:none;
+    cursor:pointer;
+    border-radius:6px;
+    padding:10px 16px;
+    letter-spacing:0.02em;
+    transition:filter 0.15s ease, transform 0.05s ease;
+  }
+  button:active{ transform:translateY(1px); }
+
+  .btn-brass{
+    background:linear-gradient(180deg, #dcb94a, var(--brass-dim));
+    color:#241a10;
+  }
+  .btn-brass:hover{ filter:brightness(1.08); }
+
+  .btn-ghost{
+    background:rgba(237,224,200,0.06);
+    color:var(--cream);
+    border:1px solid rgba(237,224,200,0.16);
+  }
+  .btn-ghost:hover{ background:rgba(237,224,200,0.11); }
+
+  .btn-play{
+    background:linear-gradient(180deg, #d65a4f, var(--tube-red));
+    color:#2a0e0c;
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-size:14px;
+    padding:12px 26px;
+    min-width:140px;
+  }
+  .btn-play.playing{
+    background:linear-gradient(180deg, #ff6b5e, #d6473b);
+    box-shadow:0 0 16px rgba(193,68,59,0.55);
+  }
+
+  .tap-count{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    align-self:center;
+  }
+
+  .sync-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px dashed rgba(237,224,200,0.14);
+    flex-wrap:wrap;
+  }
+  .sync-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--cream);
+    cursor:pointer;
+    user-select:none;
+  }
+  .sync-label input[type=checkbox]{
+    width:16px; height:16px;
+    accent-color:var(--brass);
+    cursor:pointer;
+  }
+  .bars-input{
+    width:56px;
+    text-align:center;
+    padding:6px 8px;
+  }
+  .sync-unit{
+    font-size:12px;
+    color:var(--muted);
+  }
+  .sync-status{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--amp-green-bright);
+    margin-top:6px;
+    min-height:14px;
+  }
+
+  .sig-select, .amount-input{
+    font-family:'JetBrains Mono', monospace;
+    background:rgba(0,0,0,0.25);
+    border:1px solid rgba(237,224,200,0.18);
+    color:var(--cream);
+    border-radius:6px;
+    padding:9px 10px;
+    font-size:13px;
+  }
+
+  .beat-lights{
+    display:flex;
+    gap:8px;
+    margin-top:16px;
+    justify-content:center;
+  }
+  .beat-light{
+    width:11px; height:11px;
+    border-radius:50%;
+    background:rgba(237,224,200,0.12);
+    border:1px solid rgba(237,224,200,0.2);
+    transition:background 0.05s, box-shadow 0.05s;
+  }
+  .beat-light.on{
+    background:var(--tube-red);
+    box-shadow:0 0 8px rgba(193,68,59,0.8);
+    border-color:var(--tube-red);
+  }
+  .beat-light.on.accent{
+    background:var(--brass);
+    box-shadow:0 0 10px rgba(201,162,39,0.9);
+    border-color:var(--brass);
+  }
+
+  /* ---------- TIMER ---------- */
+
+  .timer-body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .ring-wrap{
+    position:relative;
+    width:150px; height:150px;
+    margin-bottom:10px;
+  }
+  .ring-wrap svg{ transform:rotate(-90deg); }
+  .ring-track{ fill:none; stroke:rgba(237,224,200,0.1); stroke-width:8; }
+  .ring-progress{
+    fill:none;
+    stroke:var(--amp-green-bright);
+    stroke-width:8;
+    stroke-linecap:round;
+    transition:stroke-dashoffset 0.25s linear;
+  }
+  .ring-center{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+  .time-readout{
+    font-family:'JetBrains Mono', monospace;
+    font-size:26px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+    color:var(--cream);
+  }
+  .time-status{
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:4px;
+  }
+
+  .presets{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin:14px 0 10px;
+  }
+  .preset-btn{
+    background:rgba(237,224,200,0.06);
+    color:var(--cream);
+    border:1px solid rgba(237,224,200,0.16);
+    padding:7px 12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+  }
+  .preset-btn.active{
+    background:var(--amp-green);
+    border-color:var(--amp-green-bright);
+    color:#0e1a12;
+    font-weight:700;
+  }
+
+  .custom-row{
+    display:flex;
+    gap:6px;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:16px;
+  }
+  .custom-row input{
+    width:52px;
+    text-align:center;
+  }
+  .custom-row span{ font-size:12px; color:var(--muted); }
+
+  .timer-controls{
+    display:flex;
+    gap:10px;
+    width:100%;
+    justify-content:center;
+  }
+  .btn-green{
+    background:linear-gradient(180deg, #7fbd8f, var(--amp-green));
+    color:#0e1a12;
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    font-size:13px;
+    min-width:120px;
+  }
+
+  /* ---------- EXERCISE LOG ---------- */
+
+  .log-panel{
+    grid-column:1 / -1;
+    margin-top:22px;
+  }
+  .log-panel .panel-label{ margin-bottom:14px; }
+
+  .log-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .log-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  button.small{
+    padding:7px 12px;
+    font-size:12px;
+  }
+  .log-status{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--amp-green-bright);
+    min-height:16px;
+    margin-bottom:10px;
+  }
+
+  .log-filter{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:2px 0 14px;
+  }
+  .log-filter label{
+    font-size:12px;
+    color:var(--muted);
+  }
+  .log-stats{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    margin-left:auto;
+  }
+
+  .ex-badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:999px;
+    border:1px solid;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+
+  .ex-stars{
+    display:flex;
+    gap:2px;
+    flex-shrink:0;
+  }
+  .ex-stars .star{
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-size:15px;
+    line-height:1;
+    padding:2px;
+    color:rgba(237,224,200,0.2);
+  }
+  .ex-stars .star.filled{
+    color:var(--brass);
+  }
+  .ex-stars .star:hover{
+    color:var(--brass);
+    filter:brightness(1.2);
+  }
+
+  .ex-bpm-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    background:rgba(201,162,39,0.08);
+    color:var(--muted);
+    border:1px solid rgba(201,162,39,0.25);
+    border-radius:6px;
+    padding:5px 9px;
+    cursor:pointer;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .ex-bpm-btn.set{
+    color:var(--brass);
+    border-color:var(--brass);
+    background:rgba(201,162,39,0.14);
+    font-weight:700;
+  }
+  .ex-bpm-btn:hover{
+    filter:brightness(1.15);
+  }
+
+  .exercise-form{
+    display:flex;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .exercise-form input[type=text]{
+    flex:1;
+    background:rgba(0,0,0,0.25);
+    border:1px solid rgba(237,224,200,0.18);
+    color:var(--cream);
+    border-radius:6px;
+    padding:10px 12px;
+    font-family:'Work Sans', sans-serif;
+    font-size:14px;
+  }
+  .exercise-form input::placeholder{ color:var(--muted); }
+
+  .exercise-form input[type=date]{
+    background:rgba(0,0,0,0.25);
+    border:1px solid rgba(237,224,200,0.18);
+    color:var(--cream);
+    border-radius:6px;
+    padding:10px 12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color-scheme:dark;
+  }
+
+  @media (max-width: 560px){
+    .exercise-form{ flex-wrap:wrap; }
+    .exercise-form input[type=text]{ flex:1 1 100%; }
+  }
+
+  .ex-date{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:0.03em;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+
+  .exercise-list{
+    list-style:none;
+    margin:0; padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .exercise-list li{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    background:rgba(0,0,0,0.18);
+    border-radius:6px;
+    border:1px solid rgba(237,224,200,0.07);
+    flex-wrap:wrap;
+  }
+  .exercise-list li.done{ opacity:0.5; }
+  .exercise-list li.done .ex-name{ text-decoration:line-through; }
+  .ex-check{
+    width:18px; height:18px;
+    border-radius:4px;
+    border:1.5px solid var(--brass-dim);
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent;
+    color:var(--wood-dark);
+    font-size:12px;
+    font-weight:700;
+  }
+  .ex-check.checked{ background:var(--brass); border-color:var(--brass); }
+  .ex-name{ flex:1; font-size:14px; }
+  .ex-remove{
+    background:none; border:none; color:var(--muted);
+    cursor:pointer; font-size:16px; padding:2px 6px;
+    line-height:1;
+  }
+  .ex-remove:hover{ color:var(--tube-red); }
+
+  .empty-hint{
+    color:var(--muted);
+    font-size:13px;
+    font-style:italic;
+    padding:8px 4px;
+  }
+
+  footer{
+    text-align:center;
+    margin-top:30px;
+    color:var(--muted);
+    font-size:11px;
+    font-family:'JetBrains Mono', monospace;
+    letter-spacing:0.06em;
+  }
+
+  .session-overlay{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.78);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease;
+    z-index:9999;
+    padding:20px;
+  }
+  .session-overlay.active{
+    opacity:1;
+    pointer-events:auto;
+    animation:overlayFlash 0.9s ease-in-out infinite alternate;
+  }
+  @keyframes overlayFlash{
+    from{ background:rgba(0,0,0,0.78); }
+    to{ background:rgba(79,122,91,0.5); }
+  }
+  .session-overlay-content{
+    background:linear-gradient(180deg, var(--wood-panel-light), var(--wood-panel));
+    border:2px solid var(--amp-green-bright);
+    border-radius:14px;
+    padding:36px 40px;
+    text-align:center;
+    max-width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(111,168,126,0.35);
+    animation:overlayPulse 0.9s ease-in-out infinite alternate;
+  }
+  @keyframes overlayPulse{
+    from{ transform:scale(1); }
+    to{ transform:scale(1.03); }
+  }
+  .session-overlay-icon{
+    font-size:40px;
+    margin-bottom:8px;
+  }
+  .session-overlay-title{
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:26px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    color:var(--cream);
+    margin-bottom:8px;
+  }
+  .session-overlay-sub{
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:22px;
+    line-height:1.4;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .pendulum-arm{ transition:none !important; }
+    .ring-progress{ transition:none !important; }
+    .session-overlay.active{ animation:none; }
+    .session-overlay-content{ animation:none; }
+  }
+
+  button:focus-visible, input:focus-visible, .ex-check:focus-visible{
+    outline:2px solid var(--brass);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="rig">
+  <header class="rig-header">
+    <div class="brand">
+      <span class="badge">MOD. 6E</span>
+      <h1>Practice Rig</h1>
+    </div>
+    <div class="subtitle">metronomo &amp; timer per lo studio della chitarra</div>
+  </header>
+
+  <div class="panels">
+
+    <!-- METRONOME PANEL -->
+    <section class="panel" aria-label="Metronomo">
+      <div class="screw-tr"></div><div class="screw-bl"></div>
+      <div class="panel-label">Metronomo</div>
+
+      <div class="metro-stage">
+        <div class="pendulum-box">
+          <div class="pendulum-arm" id="pendulumArm">
+            <div class="bob"></div>
+          </div>
+          <div class="pendulum-base"></div>
+        </div>
+
+        <div class="bpm-readout">
+          <input type="number" class="bpm-num" id="bpmNum" value="100" min="30" max="240" inputmode="numeric" aria-label="Battiti al minuto (valore esatto)">
+          <span class="bpm-unit">bpm</span>
+        </div>
+      </div>
+
+      <input type="range" min="30" max="240" value="100" class="bpm-slider" id="bpmSlider" aria-label="Battiti al minuto">
+
+      <div class="beat-lights" id="beatLights" aria-hidden="true"></div>
+
+      <div class="row controls">
+        <button class="btn-play" id="playBtn">Avvia</button>
+        <div class="row" style="gap:8px;">
+          <button class="btn-ghost" id="tapBtn">Tap tempo</button>
+          <select class="sig-select" id="sigSelect" aria-label="Tempo musicale">
+            <option value="2">2/4</option>
+            <option value="3">3/4</option>
+            <option value="4" selected>4/4</option>
+            <option value="6">6/8</option>
+          </select>
+        </div>
+      </div>
+      <div class="tap-count" id="tapHint">&nbsp;</div>
+
+      <div class="sync-row">
+        <label class="sync-label" for="autoStartToggle">
+          <input type="checkbox" id="autoStartToggle">
+          Avvia il timer dopo
+        </label>
+        <input type="number" id="countInBars" min="1" max="32" value="4" class="amount-input bars-input" aria-label="Numero di battute">
+        <span class="sync-unit">battute</span>
+      </div>
+      <div class="sync-status" id="syncStatus">&nbsp;</div>
+    </section>
+
+    <!-- TIMER PANEL -->
+    <section class="panel" aria-label="Timer">
+      <div class="screw-tr"></div><div class="screw-bl"></div>
+      <div class="panel-label">Timer sessione</div>
+
+      <div class="timer-body">
+        <div class="ring-wrap">
+          <svg width="150" height="150" viewBox="0 0 150 150">
+            <circle class="ring-track" cx="75" cy="75" r="66"></circle>
+            <circle class="ring-progress" id="ringProgress" cx="75" cy="75" r="66"
+                    stroke-dasharray="415" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="ring-center">
+            <div class="time-readout" id="timeReadout">10:00</div>
+            <div class="time-status" id="timeStatus">pronto</div>
+          </div>
+        </div>
+
+        <div class="presets" id="presets">
+          <button class="preset-btn" data-min="5">5'</button>
+          <button class="preset-btn active" data-min="10">10'</button>
+          <button class="preset-btn" data-min="15">15'</button>
+          <button class="preset-btn" data-min="20">20'</button>
+          <button class="preset-btn" data-min="30">30'</button>
+        </div>
+
+        <div class="custom-row">
+          <input type="number" min="0" max="180" class="amount-input" id="customMin" placeholder="0">
+          <span>min</span>
+          <input type="number" min="0" max="59" class="amount-input" id="customSec" placeholder="00">
+          <span>sec</span>
+        </div>
+
+        <div class="timer-controls">
+          <button class="btn-green" id="timerStartBtn">Avvia</button>
+          <button class="btn-ghost" id="timerResetBtn">Azzera</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXERCISE LOG -->
+    <section class="panel log-panel" aria-label="Esercizi">
+      <div class="screw-tr"></div><div class="screw-bl"></div>
+
+      <div class="log-header">
+        <div class="panel-label" style="margin-bottom:0;">Esercizi di oggi</div>
+        <div class="log-actions">
+          <button type="button" class="btn-ghost small" id="exportBtn">Esporta lista</button>
+          <button type="button" class="btn-ghost small" id="importBtn">Importa lista</button>
+          <input type="file" id="importFile" accept="application/json" hidden>
+        </div>
+      </div>
+      <div class="log-status" id="logStatus">&nbsp;</div>
+
+      <form class="exercise-form" id="exerciseForm">
+        <input type="text" id="exerciseInput" placeholder="Es. Scale pentatoniche in La, arpeggi, pezzo nuovo…" maxlength="80">
+        <input type="date" id="exerciseDate" aria-label="Data">
+        <select id="exerciseCategory" class="sig-select" aria-label="Tipologia"></select>
+        <button type="submit" class="btn-brass">Aggiungi</button>
+      </form>
+
+      <div class="log-filter">
+        <label for="categoryFilter">Filtra per tipologia</label>
+        <select id="categoryFilter" class="sig-select"></select>
+        <span class="log-stats" id="logStats"></span>
+      </div>
+
+      <ul class="exercise-list" id="exerciseList"></ul>
+      <div class="empty-hint" id="emptyHint">Aggiungi il primo esercizio da lavorare in questa sessione.</div>
+    </section>
+
+  </div>
+
+  <footer>practice rig — resta in memoria solo per questa sessione del browser</footer>
+</div>
+
+<div class="session-overlay" id="sessionOverlay">
+  <div class="session-overlay-content">
+    <div class="session-overlay-icon">⏱</div>
+    <div class="session-overlay-title">Tempo scaduto!</div>
+    <div class="session-overlay-sub">Hai raggiunto la durata impostata per la sessione.</div>
+    <button type="button" class="btn-green" id="overlayDismiss">Continua</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ METRONOME ============ */
+
+  const bpmSlider = document.getElementById('bpmSlider');
+  const bpmNum = document.getElementById('bpmNum');
+  const playBtn = document.getElementById('playBtn');
+  const tapBtn = document.getElementById('tapBtn');
+  const tapHint = document.getElementById('tapHint');
+  const sigSelect = document.getElementById('sigSelect');
+  const pendulumArm = document.getElementById('pendulumArm');
+  const beatLightsEl = document.getElementById('beatLights');
+  const autoStartToggle = document.getElementById('autoStartToggle');
+  const countInBarsInput = document.getElementById('countInBars');
+  const syncStatus = document.getElementById('syncStatus');
+
+  let bpm = 100;
+  let beatsPerBar = 4;
+  let isPlaying = false;
+  let audioCtx = null;
+  let nextNoteTime = 0;
+  let currentBeat = 0;
+  let schedulerTimer = null;
+  let pendulumDirection = 1;
+  let barsStarted = 0;
+  let autoTimerTriggered = false;
+  const LOOKAHEAD_MS = 25;
+  const SCHEDULE_AHEAD = 0.12;
+
+  function updateSliderFill(){
+    const pct = ((bpm - 30) / (240 - 30)) * 100;
+    bpmSlider.style.setProperty('--fill', pct + '%');
+  }
+
+  function setBpm(v){
+    bpm = Math.max(30, Math.min(240, Math.round(v)));
+    bpmSlider.value = bpm;
+    bpmNum.value = bpm;
+    updateSliderFill();
+    updatePendulumSpeed();
+  }
+
+  function buildBeatLights(){
+    beatLightsEl.innerHTML = '';
+    for(let i=0;i<beatsPerBar;i++){
+      const d = document.createElement('div');
+      d.className = 'beat-light';
+      beatLightsEl.appendChild(d);
+    }
+  }
+
+  function lightBeat(beatIndex){
+    const lights = beatLightsEl.children;
+    for(let i=0;i<lights.length;i++){ lights[i].classList.remove('on','accent'); }
+    if(lights[beatIndex]){
+      lights[beatIndex].classList.add('on');
+      if(beatIndex === 0) lights[beatIndex].classList.add('accent');
+      setTimeout(()=>{ lights[beatIndex] && lights[beatIndex].classList.remove('on','accent'); }, 90);
+    }
+  }
+
+  function playClick(time, accent){
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = accent ? 1500 : 1000;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(accent ? 0.35 : 0.22, time + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(time);
+    osc.stop(time + 0.06);
+  }
+
+  function getTargetBars(){
+    const v = parseInt(countInBarsInput.value, 10);
+    return Math.max(1, Math.min(32, isNaN(v) ? 4 : v));
+  }
+
+  function triggerAutoStartTimer(){
+    if(autoTimerTriggered) return;
+    autoTimerTriggered = true;
+    if(timerRunning){ pauseTimer(); remainingSeconds = totalSeconds; renderTimer(); }
+    startTimer();
+    syncStatus.textContent = 'Timer avviato ✓';
+  }
+
+  function scheduler(){
+    while(nextNoteTime < audioCtx.currentTime + SCHEDULE_AHEAD){
+      const beatIndex = currentBeat;
+      const t = nextNoteTime;
+      const delay = Math.max(0, (t - audioCtx.currentTime) * 1000);
+
+      if(beatIndex === 0){
+        barsStarted++;
+        const targetBars = getTargetBars();
+        if(autoStartToggle.checked && !autoTimerTriggered){
+          if(barsStarted <= targetBars){
+            setTimeout(()=>{
+              syncStatus.textContent = `Conto: battuta ${barsStarted} di ${targetBars}`;
+            }, delay);
+          } else if(barsStarted === targetBars + 1){
+            setTimeout(triggerAutoStartTimer, delay);
+          }
+        }
+      }
+
+      playClick(t, beatIndex === 0);
+      setTimeout(()=> lightBeat(beatIndex), delay);
+
+      const secondsPerBeat = 60.0 / bpm;
+      nextNoteTime += secondsPerBeat;
+      currentBeat = (currentBeat + 1) % beatsPerBar;
+    }
+    schedulerTimer = setTimeout(scheduler, LOOKAHEAD_MS);
+  }
+
+  function updatePendulumSpeed(){
+    if(!isPlaying) return;
+    const secondsPerBeat = 60.0 / bpm;
+    pendulumArm.style.transition = `transform ${secondsPerBeat}s linear`;
+  }
+
+  function swingPendulum(){
+    if(!isPlaying) return;
+    pendulumDirection *= -1;
+    pendulumArm.style.transform = `translateX(-50%) rotate(${pendulumDirection * 22}deg)`;
+  }
+
+  let pendulumInterval = null;
+
+  function startMetronome(){
+    if(isPlaying) return;
+    if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+    isPlaying = true;
+    currentBeat = 0;
+    barsStarted = 0;
+    autoTimerTriggered = false;
+    syncStatus.textContent = autoStartToggle.checked ? 'Conto alla rovescia…' : '\u00a0';
+    nextNoteTime = audioCtx.currentTime + 0.05;
+    scheduler();
+    playBtn.textContent = 'Ferma';
+    playBtn.classList.add('playing');
+    updatePendulumSpeed();
+    swingPendulum();
+    pendulumInterval = setInterval(swingPendulum, (60000 / bpm));
+  }
+
+  function stopMetronome(){
+    isPlaying = false;
+    clearTimeout(schedulerTimer);
+    clearInterval(pendulumInterval);
+    playBtn.textContent = 'Avvia';
+    playBtn.classList.remove('playing');
+    pendulumArm.style.transition = 'transform 0.3s ease';
+    pendulumArm.style.transform = 'translateX(-50%) rotate(0deg)';
+    const lights = beatLightsEl.children;
+    for(let i=0;i<lights.length;i++){ lights[i].classList.remove('on','accent'); }
+    syncStatus.textContent = '\u00a0';
+  }
+
+  playBtn.addEventListener('click', ()=>{
+    if(isPlaying){ stopMetronome(); } else { startMetronome(); }
+  });
+
+  autoStartToggle.addEventListener('change', ()=>{
+    if(!isPlaying){
+      syncStatus.textContent = '\u00a0';
+    }
+  });
+
+  bpmSlider.addEventListener('input', (e)=>{
+    setBpm(e.target.value);
+    if(isPlaying){
+      clearInterval(pendulumInterval);
+      pendulumInterval = setInterval(swingPendulum, (60000 / bpm));
+    }
+  });
+
+  function applyBpmInput(){
+    const v = parseInt(bpmNum.value, 10);
+    if(!isNaN(v)){
+      setBpm(v);
+      if(isPlaying){
+        clearInterval(pendulumInterval);
+        pendulumInterval = setInterval(swingPendulum, (60000 / bpm));
+      }
+    } else {
+      bpmNum.value = bpm;
+    }
+  }
+
+  bpmNum.addEventListener('change', applyBpmInput);
+  bpmNum.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ applyBpmInput(); bpmNum.blur(); }
+  });
+  bpmNum.addEventListener('blur', applyBpmInput);
+
+  sigSelect.addEventListener('change', (e)=>{
+    beatsPerBar = parseInt(e.target.value, 10);
+    currentBeat = 0;
+    buildBeatLights();
+  });
+
+  let tapTimes = [];
+  tapBtn.addEventListener('click', ()=>{
+    const now = performance.now();
+    tapTimes = tapTimes.filter(t => now - t < 2200);
+    tapTimes.push(now);
+    if(tapTimes.length >= 2){
+      const intervals = [];
+      for(let i=1;i<tapTimes.length;i++){ intervals.push(tapTimes[i]-tapTimes[i-1]); }
+      const avg = intervals.reduce((a,b)=>a+b,0) / intervals.length;
+      const newBpm = Math.round(60000 / avg);
+      setBpm(newBpm);
+      if(isPlaying){
+        clearInterval(pendulumInterval);
+        pendulumInterval = setInterval(swingPendulum, (60000 / bpm));
+      }
+      tapHint.textContent = tapTimes.length + ' tap registrati';
+    } else {
+      tapHint.textContent = 'continua a battere il tempo…';
+    }
+  });
+
+  buildBeatLights();
+  setBpm(100);
+
+  /* ============ TIMER ============ */
+
+  const timeReadout = document.getElementById('timeReadout');
+  const timeStatus = document.getElementById('timeStatus');
+  const ringProgress = document.getElementById('ringProgress');
+  const presetsEl = document.getElementById('presets');
+  const customMin = document.getElementById('customMin');
+  const customSec = document.getElementById('customSec');
+  const timerStartBtn = document.getElementById('timerStartBtn');
+  const timerResetBtn = document.getElementById('timerResetBtn');
+  const sessionOverlay = document.getElementById('sessionOverlay');
+  const overlayDismiss = document.getElementById('overlayDismiss');
+
+  const RING_CIRC = 2 * Math.PI * 66;
+  ringProgress.setAttribute('stroke-dasharray', RING_CIRC);
+
+  let totalSeconds = 10 * 60;
+  let remainingSeconds = totalSeconds;
+  let timerRunning = false;
+  let timerInterval = null;
+
+  function formatTime(s){
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+  }
+
+  function renderTimer(){
+    timeReadout.textContent = formatTime(remainingSeconds);
+    const frac = totalSeconds > 0 ? (remainingSeconds / totalSeconds) : 0;
+    ringProgress.setAttribute('stroke-dashoffset', RING_CIRC * (1 - frac));
+  }
+
+  function setDuration(seconds){
+    totalSeconds = Math.max(1, seconds);
+    remainingSeconds = totalSeconds;
+    renderTimer();
+    timeStatus.textContent = 'pronto';
+  }
+
+  presetsEl.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.preset-btn');
+    if(!btn) return;
+    [...presetsEl.children].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    customMin.value = '';
+    customSec.value = '';
+    pauseTimer();
+    setDuration(parseInt(btn.dataset.min, 10) * 60);
+  });
+
+  function applyCustomDuration(){
+    const mins = parseInt(customMin.value, 10) || 0;
+    let secs = parseInt(customSec.value, 10) || 0;
+    if(secs > 59){ secs = 59; customSec.value = 59; }
+    const total = mins * 60 + secs;
+    if(total > 0){
+      [...presetsEl.children].forEach(b => b.classList.remove('active'));
+      pauseTimer();
+      setDuration(total);
+    }
+  }
+
+  customMin.addEventListener('input', applyCustomDuration);
+  customSec.addEventListener('input', applyCustomDuration);
+
+  function playTimerAlert(){
+    if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+    const now = audioCtx.currentTime;
+    for(let i = 0; i < 3; i++){
+      const t = now + i * 0.35;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.4, t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.3);
+    }
+  }
+
+  function tickTimer(){
+    if(remainingSeconds <= 0){
+      pauseTimer();
+      timeStatus.textContent = 'sessione completata';
+      ringProgress.style.stroke = 'var(--brass)';
+      playTimerAlert();
+      sessionOverlay.classList.add('active');
+      return;
+    }
+    remainingSeconds -= 1;
+    renderTimer();
+  }
+
+  function hideSessionOverlay(){
+    sessionOverlay.classList.remove('active');
+  }
+
+  overlayDismiss.addEventListener('click', hideSessionOverlay);
+  sessionOverlay.addEventListener('click', (e)=>{
+    if(e.target === sessionOverlay) hideSessionOverlay();
+  });
+
+  function startTimer(){
+    if(timerRunning) return;
+    if(remainingSeconds <= 0) remainingSeconds = totalSeconds;
+    timerRunning = true;
+    hideSessionOverlay();
+    ringProgress.style.stroke = 'var(--amp-green-bright)';
+    timerStartBtn.textContent = 'Pausa';
+    timeStatus.textContent = 'in corso';
+    timerInterval = setInterval(tickTimer, 1000);
+  }
+
+  function pauseTimer(){
+    timerRunning = false;
+    clearInterval(timerInterval);
+    timerStartBtn.textContent = 'Avvia';
+    if(remainingSeconds > 0 && remainingSeconds < totalSeconds){
+      timeStatus.textContent = 'in pausa';
+    }
+  }
+
+  timerStartBtn.addEventListener('click', ()=>{
+    if(timerRunning){ pauseTimer(); } else { startTimer(); }
+  });
+
+  timerResetBtn.addEventListener('click', ()=>{
+    pauseTimer();
+    hideSessionOverlay();
+    remainingSeconds = totalSeconds;
+    ringProgress.style.stroke = 'var(--amp-green-bright)';
+    renderTimer();
+    timeStatus.textContent = 'pronto';
+  });
+
+  renderTimer();
+
+  /* ============ EXERCISE LOG ============ */
+
+  const exerciseForm = document.getElementById('exerciseForm');
+  const exerciseInput = document.getElementById('exerciseInput');
+  const exerciseDate = document.getElementById('exerciseDate');
+  const exerciseCategory = document.getElementById('exerciseCategory');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const exerciseList = document.getElementById('exerciseList');
+  const emptyHint = document.getElementById('emptyHint');
+  const exportBtn = document.getElementById('exportBtn');
+  const importBtn = document.getElementById('importBtn');
+  const importFile = document.getElementById('importFile');
+  const logStatus = document.getElementById('logStatus');
+  const logStats = document.getElementById('logStats');
+  let logStatusTimer = null;
+
+  const BUILTIN_CATEGORIES = {
+    tecnica:          { label: 'Tecnica',          color: '#c9a227' },
+    scale:            { label: 'Scale',             color: '#4f7a5b' },
+    arpeggi:          { label: 'Arpeggi',           color: '#c1443b' },
+    accordi:          { label: 'Accordi',           color: '#4a7a9a' },
+    ritmica:          { label: 'Ritmica',           color: '#b5651d' },
+    teoria:           { label: 'Teoria',            color: '#8a6bb5' },
+    repertorio:       { label: 'Repertorio',        color: '#a68a5b' },
+    improvvisazione:  { label: 'Improvvisazione',   color: '#cf8a2e' },
+    altro:            { label: 'Altro',             color: '#8a7d63' }
+  };
+  const CUSTOM_COLOR_POOL = ['#5a8f7b','#9a5a8f','#5a7a9f','#9f7a5a','#7a9f5a','#9f5a5a','#5a9f9f','#8f5a9f'];
+
+  let CATEGORIES = { ...BUILTIN_CATEGORIES };
+  let customCategories = {};
+
+  function categoryInfo(id){
+    return CATEGORIES[id] || CATEGORIES.altro;
+  }
+
+  function hexToRgb(hex){
+    const h = hex.replace('#','');
+    const bigint = parseInt(h, 16);
+    return `${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}`;
+  }
+
+  function slugify(str){
+    const base = str.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    return base || ('tipo-' + Date.now());
+  }
+
+  function populateCategorySelects(){
+    const entries = Object.entries(CATEGORIES);
+    const optionsHtml = entries.map(([id, info]) =>
+      `<option value="${id}">${info.label}</option>`
+    ).join('');
+
+    const prevExVal = exerciseCategory.value;
+    exerciseCategory.innerHTML = optionsHtml + `<option value="__new__">➕ Nuova tipologia…</option>`;
+    if(prevExVal && CATEGORIES[prevExVal]) exerciseCategory.value = prevExVal;
+
+    const prevFilterVal = categoryFilter.value || 'all';
+    categoryFilter.innerHTML = `<option value="all">Tutte</option>` + optionsHtml;
+    categoryFilter.value = [...categoryFilter.options].some(o => o.value === prevFilterVal) ? prevFilterVal : 'all';
+  }
+
+  function addCustomCategory(label){
+    const baseId = slugify(label);
+    let id = baseId;
+    let suffix = 1;
+    while(CATEGORIES[id]){ id = `${baseId}-${++suffix}`; }
+    const color = CUSTOM_COLOR_POOL[Object.keys(customCategories).length % CUSTOM_COLOR_POOL.length];
+    const info = { label: label.slice(0, 30), color };
+    CATEGORIES[id] = info;
+    customCategories[id] = info;
+    saveCustomCategories();
+    populateCategorySelects();
+    exerciseCategory.value = id;
+  }
+
+  exerciseCategory.addEventListener('change', ()=>{
+    if(exerciseCategory.value === '__new__'){
+      const name = window.prompt('Nome della nuova tipologia (es. "Slide", "Fingerstyle"...)');
+      if(name && name.trim()){
+        addCustomCategory(name.trim());
+      } else {
+        exerciseCategory.value = 'altro';
+      }
+    }
+  });
+
+  function normalizeExercise(ex){
+    const bpmVal = Number(ex.bpm);
+    return {
+      id: ex.id,
+      name: String(ex.name || '').slice(0, 80),
+      date: ex.date || todayISO(),
+      done: !!ex.done,
+      category: (ex.category && CATEGORIES[ex.category]) ? ex.category : 'altro',
+      progress: Number.isInteger(ex.progress) ? Math.max(0, Math.min(5, ex.progress)) : 0,
+      bpm: (Number.isFinite(bpmVal) && bpmVal > 0) ? Math.round(bpmVal) : null
+    };
+  }
+
+  function setLogStatus(msg){
+    logStatus.textContent = msg;
+    clearTimeout(logStatusTimer);
+    logStatusTimer = setTimeout(()=>{ logStatus.textContent = '\u00a0'; }, 5000);
+  }
+
+  function todayISO(){
+    const d = new Date();
+    const tzOffset = d.getTimezoneOffset() * 60000;
+    return new Date(d - tzOffset).toISOString().slice(0,10);
+  }
+
+  function formatDateLabel(iso){
+    const [y,m,d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  exerciseDate.value = todayISO();
+
+  let exercises = [];
+  let idCounter = 0;
+
+  const STORAGE_KEY = 'guitar-practice-exercises';
+  const CATEGORY_STORAGE_KEY = 'guitar-practice-custom-categories';
+
+  function saveExercises(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(exercises));
+    }catch(err){
+      console.error('Impossibile salvare gli esercizi:', err);
+    }
+  }
+
+  function saveCustomCategories(){
+    try{
+      localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(customCategories));
+    }catch(err){
+      console.error('Impossibile salvare le tipologie personalizzate:', err);
+    }
+  }
+
+  function loadCustomCategories(){
+    try{
+      const raw = localStorage.getItem(CATEGORY_STORAGE_KEY);
+      if(raw){
+        customCategories = JSON.parse(raw);
+        CATEGORIES = { ...BUILTIN_CATEGORIES, ...customCategories };
+      }
+    }catch(err){
+      customCategories = {};
+    }
+    populateCategorySelects();
+  }
+
+  function loadExercises(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        exercises = JSON.parse(raw).map(normalizeExercise);
+        idCounter = exercises.reduce((max, e) => Math.max(max, e.id + 1), 0);
+      }
+    }catch(err){
+      exercises = [];
+    }
+    renderExercises();
+  }
+
+
+  function renderExercises(){
+    exerciseList.innerHTML = '';
+
+    const filterVal = categoryFilter.value;
+    const filtered = filterVal === 'all' ? exercises : exercises.filter(ex => ex.category === filterVal);
+
+    emptyHint.style.display = filtered.length ? 'none' : 'block';
+    emptyHint.textContent = exercises.length
+      ? 'Nessun esercizio con questa tipologia.'
+      : 'Aggiungi il primo esercizio da lavorare in questa sessione.';
+
+    // ordina per data (più recenti prima), poi per ordine di inserimento
+    const sorted = [...filtered].sort((a,b) => b.date.localeCompare(a.date) || a.id - b.id);
+
+    sorted.forEach(ex => {
+      const li = document.createElement('li');
+      if(ex.done) li.classList.add('done');
+
+      const check = document.createElement('button');
+      check.className = 'ex-check' + (ex.done ? ' checked' : '');
+      check.type = 'button';
+      check.setAttribute('aria-label', ex.done ? 'Segna come da fare' : 'Segna come completato');
+      check.textContent = ex.done ? '✓' : '';
+      check.addEventListener('click', ()=>{
+        ex.done = !ex.done;
+        renderExercises();
+        saveExercises();
+      });
+
+      const name = document.createElement('span');
+      name.className = 'ex-name';
+      name.textContent = ex.name;
+
+      const cat = categoryInfo(ex.category);
+      const badge = document.createElement('span');
+      badge.className = 'ex-badge';
+      badge.textContent = cat.label;
+      badge.style.color = cat.color;
+      badge.style.borderColor = cat.color;
+      badge.style.background = `rgba(${hexToRgb(cat.color)}, 0.16)`;
+
+      const stars = document.createElement('span');
+      stars.className = 'ex-stars';
+      stars.setAttribute('role', 'group');
+      stars.setAttribute('aria-label', 'Progresso su 5');
+      for(let i = 1; i <= 5; i++){
+        const star = document.createElement('button');
+        star.type = 'button';
+        star.className = 'star' + (i <= ex.progress ? ' filled' : '');
+        star.textContent = '★';
+        star.setAttribute('aria-label', `Progresso ${i} su 5`);
+        star.addEventListener('click', ()=>{
+          ex.progress = (ex.progress === i) ? i - 1 : i;
+          renderExercises();
+          saveExercises();
+        });
+        stars.appendChild(star);
+      }
+
+      const bpmBtn = document.createElement('button');
+      bpmBtn.type = 'button';
+      bpmBtn.className = 'ex-bpm-btn' + (ex.bpm ? ' set' : '');
+      bpmBtn.textContent = ex.bpm ? `♩ ${ex.bpm}` : 'Segna tempo';
+      bpmBtn.title = 'Salva il BPM attuale del metronomo per questo esercizio';
+      bpmBtn.addEventListener('click', ()=>{
+        ex.bpm = bpm;
+        renderExercises();
+        saveExercises();
+        setLogStatus(`Tempo ${bpm} BPM salvato per "${ex.name}"`);
+      });
+
+      const date = document.createElement('span');
+      date.className = 'ex-date';
+      date.textContent = formatDateLabel(ex.date);
+
+      const remove = document.createElement('button');
+      remove.className = 'ex-remove';
+      remove.type = 'button';
+      remove.setAttribute('aria-label', 'Rimuovi esercizio');
+      remove.textContent = '×';
+      remove.addEventListener('click', ()=>{
+        exercises = exercises.filter(e => e.id !== ex.id);
+        renderExercises();
+        saveExercises();
+      });
+
+      li.appendChild(check);
+      li.appendChild(name);
+      li.appendChild(badge);
+      li.appendChild(stars);
+      li.appendChild(bpmBtn);
+      li.appendChild(date);
+      li.appendChild(remove);
+      exerciseList.appendChild(li);
+    });
+
+    if(filtered.length){
+      const avg = filtered.reduce((sum, ex) => sum + ex.progress, 0) / filtered.length;
+      logStats.textContent = `Progresso medio: ${avg.toFixed(1)}/5 su ${filtered.length} esercizi`;
+    } else {
+      logStats.textContent = '';
+    }
+  }
+
+  exerciseForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const val = exerciseInput.value.trim();
+    if(!val) return;
+    const dateVal = exerciseDate.value || todayISO();
+    const categoryVal = CATEGORIES[exerciseCategory.value] ? exerciseCategory.value : 'altro';
+    exercises.push({ id: idCounter++, name: val, date: dateVal, done: false, category: categoryVal, progress: 0, bpm: null });
+    exerciseInput.value = '';
+    exerciseDate.value = todayISO();
+    exerciseInput.focus();
+    renderExercises();
+    saveExercises();
+  });
+
+  categoryFilter.addEventListener('change', renderExercises);
+
+  exportBtn.addEventListener('click', ()=>{
+    if(!exercises.length){
+      setLogStatus('Nessun esercizio da esportare.');
+      return;
+    }
+    const dataStr = JSON.stringify(exercises, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `esercizi-chitarra-${todayISO()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setLogStatus('Lista esportata.');
+  });
+
+  importBtn.addEventListener('click', ()=>{
+    importFile.click();
+  });
+
+  importFile.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      try{
+        const imported = JSON.parse(ev.target.result);
+        if(!Array.isArray(imported)) throw new Error('formato non valido');
+        const existingKeys = new Set(exercises.map(ex => ex.name + '|' + ex.date));
+        let added = 0;
+        imported.forEach(item => {
+          if(item && typeof item.name === 'string' && typeof item.date === 'string'){
+            const key = item.name + '|' + item.date;
+            if(!existingKeys.has(key)){
+              const norm = normalizeExercise({ id: idCounter++, name: item.name, date: item.date, done: item.done, category: item.category, progress: item.progress, bpm: item.bpm });
+              exercises.push(norm);
+              existingKeys.add(key);
+              added++;
+            }
+          }
+        });
+        renderExercises();
+        saveExercises();
+        setLogStatus(added > 0 ? `Importati ${added} esercizi.` : 'Nessun nuovo esercizio da importare (già presenti).');
+      }catch(err){
+        setLogStatus('File non valido: usa un file esportato da questa dashboard.');
+      }
+      importFile.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  loadCustomCategories();
+  loadExercises();
+
+})();
+</script>
+
+</body>
+</html>
