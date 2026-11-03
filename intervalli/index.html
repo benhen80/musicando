@@ -1,1 +1,198 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Allenamento intervalli</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E8EEF1;--surface:#F8FAFB;--ink:#14232B;--muted:#5A6B74;--accent:#0E6B73;--on-accent:#fff;--hot:#D9822B;--good:#2E7D4F;--bad:#B3432F;--line:#C9D3D9;--key:#fff;--keyb:#14232B;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10191E;--surface:#172229;--ink:#E6EEF1;--muted:#8FA3AD;--accent:#4FC1C9;--on-accent:#0B1418;--hot:#F0A04B;--good:#5BC083;--bad:#F07A63;--line:#2A3A43;--key:#DDE6EA;--keyb:#05090B}}
+:root[data-theme="dark"]{--bg:#10191E;--surface:#172229;--ink:#E6EEF1;--muted:#8FA3AD;--accent:#4FC1C9;--on-accent:#0B1418;--hot:#F0A04B;--good:#5BC083;--bad:#F07A63;--line:#2A3A43;--key:#DDE6EA;--keyb:#05090B}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 40px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;margin-bottom:20px}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;letter-spacing:-.02em;line-height:1}
+.sub{margin:6px 0 0;color:var(--muted);max-width:44ch}
+.kpis{display:flex;gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:84px}
+.kpi b{display:block;font-size:1.6rem;font-weight:800;line-height:1.1}
+.kpi span{font-size:.8rem;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel h2{margin:0 0 12px;font-size:1.05rem;font-weight:600}
+.stage{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.play{width:96px;height:96px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);cursor:pointer;display:grid;place-items:center;flex:none;transition:transform .12s}
+.play:active{transform:scale(.94)}
+.play svg{width:38px;height:38px;fill:currentColor}
+.play.on{background:var(--hot)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+.msg{flex:1;min-width:180px}
+.msg .big{font-size:1.5rem;font-weight:800;line-height:1.15;min-height:1.7rem}
+.msg .big.ok{color:var(--good)}.msg .big.ko{color:var(--bad)}
+.msg p{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.answers{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ans{padding:12px 10px;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;cursor:pointer;text-align:left;font-weight:600}
+.ans small{display:block;font-weight:400;color:var(--muted)}
+.ans:hover:not(:disabled){border-color:var(--accent)}
+.ans:disabled{cursor:default}
+.ans.right{background:var(--good);border-color:var(--good);color:#fff}.ans.right small{color:#fff}
+.ans.wrong{background:var(--bad);border-color:var(--bad);color:#fff}.ans.wrong small{color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{padding:10px 16px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;cursor:pointer;font-weight:600}
+.btn.main{background:var(--ink);color:var(--bg)}
+.btn:disabled{opacity:.35;cursor:default}
+.kbd{position:relative;height:96px;margin-top:18px;display:flex;user-select:none}
+.w{flex:1;background:var(--key);border:1px solid var(--keyb);border-top:0;border-radius:0 0 4px 4px;transition:background .15s}
+.b{position:absolute;top:0;width:3.2%;height:58%;background:var(--keyb);border-radius:0 0 3px 3px;transition:background .15s;transform:translateX(-50%)}
+.w.hit,.b.hit{background:var(--hot)}
+.field{margin-bottom:14px}
+.field label,.field .lab{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+select{width:100%;padding:9px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);font:inherit;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 11px;border-radius:999px;border:1.5px solid var(--line);background:transparent;cursor:pointer;font-size:.88rem}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.presets{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.presets button{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer;font-size:.85rem}
+.stats{margin-top:16px}
+.st{display:grid;grid-template-columns:118px 1fr 52px;gap:8px;align-items:center;font-size:.85rem;padding:3px 0}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0}
+.st em{font-style:normal;color:var(--muted);text-align:right}
+.foot{margin-top:14px;color:var(--muted);font-size:.82rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Allenamento intervalli</h1>
+    <p class="sub">Ascolta i due suoni, riconosci l’intervallo. Ogni domanda parte da una nota casuale.</p>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><b id="kScore">0</b><span>Punti</span></div>
+    <div class="kpi"><b id="kStreak">0</b><span>Serie</span></div>
+    <div class="kpi"><b id="kAcc">–</b><span>Precisione</span></div>
+  </div>
+</header>
 
+<div class="grid">
+  <section class="panel">
+    <h2>Domanda</h2>
+    <div class="stage">
+      <button class="play" id="play" aria-label="Ascolta l’intervallo"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+      <div class="msg"><div class="big" id="big">Premi play</div><p id="hint">Premi Spazio per riascoltare, Invio per la prossima.</p></div>
+    </div>
+    <div class="answers" id="answers"></div>
+    <div class="row">
+      <button class="btn" id="replay" disabled>Riascolta</button>
+      <button class="btn main" id="next" disabled>Prossima domanda</button>
+    </div>
+    <div class="kbd" id="kbd" aria-hidden="true"></div>
+  </section>
+
+  <aside class="panel">
+    <h2>Impostazioni</h2>
+    <div class="field">
+      <label for="dir">Direzione</label>
+      <select id="dir">
+        <option value="asc">Ascendente</option>
+        <option value="desc">Discendente</option>
+        <option value="har">Armonico (insieme)</option>
+        <option value="mix">Casuale</option>
+      </select>
+    </div>
+    <div class="field">
+      <span class="lab">Intervalli da allenare</span>
+      <div class="presets">
+        <button data-p="base">Base</button><button data-p="medio">Medio</button><button data-p="tutti">Tutti</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="stats">
+      <h2>Precisione per intervallo</h2>
+      <div id="stats"></div>
+      <div class="row"><button class="btn" id="reset">Azzera statistiche</button></div>
+    </div>
+    <p class="foot">Se non senti nulla, controlla il volume e che il telefono non sia in silenzioso.</p>
+  </aside>
+</div>
+</div>
+
+<script>
+const IV=[
+ {s:1,n:"Seconda minore",a:"2m"},{s:2,n:"Seconda maggiore",a:"2M"},{s:3,n:"Terza minore",a:"3m"},
+ {s:4,n:"Terza maggiore",a:"3M"},{s:5,n:"Quarta giusta",a:"4G"},{s:6,n:"Tritono",a:"4A/5d"},
+ {s:7,n:"Quinta giusta",a:"5G"},{s:8,n:"Sesta minore",a:"6m"},{s:9,n:"Sesta maggiore",a:"6M"},
+ {s:10,n:"Settima minore",a:"7m"},{s:11,n:"Settima maggiore",a:"7M"},{s:12,n:"Ottava",a:"8G"}];
+const PRE={base:[3,4,5,7,12],medio:[2,3,4,5,7,9,10,12],tutti:IV.map(i=>i.s)};
+const LO=48,HI=83;
+let active=new Set(PRE.base),stats={},score=0,streak=0,cur=null,answered=false,ctx=null,timer=null;
+const $=id=>document.getElementById(id);
+try{const x=JSON.parse(localStorage.getItem("iv-stats")||"null");if(x){stats=x.stats||{};score=x.score||0}}catch(e){}
+function save(){try{localStorage.setItem("iv-stats",JSON.stringify({stats,score}))}catch(e){}}
+
+// tastiera
+const kbd=$("kbd"),blk=[1,3,6,8,10],keyEl={};
+(function(){let whites=[];for(let m=LO;m<=HI;m++)if(!blk.includes(m%12===0?0:m%12)&&![1,3,6,8,10].includes(m%12))whites.push(m);
+const W=whites.length;
+whites.forEach(m=>{const d=document.createElement("div");d.className="w";kbd.appendChild(d);keyEl[m]=d});
+whites.forEach((m,i)=>{const n=m+1;if(n<=HI&&[1,3,6,8,10].includes(n%12)){const d=document.createElement("div");d.className="b";d.style.left=((i+1)/W*100)+"%";kbd.appendChild(d);keyEl[n]=d}})})();
+function light(ns){Object.values(keyEl).forEach(e=>e.classList.remove("hit"));ns.forEach(n=>keyEl[n]&&keyEl[n].classList.add("hit"))}
+
+// UI impostazioni
+function drawChips(){const c=$("chips");c.innerHTML="";IV.forEach(i=>{const b=document.createElement("button");b.className="chip";b.textContent=i.a;b.title=i.n;b.setAttribute("aria-pressed",active.has(i.s));
+b.onclick=()=>{if(active.has(i.s)){if(active.size<=2)return;active.delete(i.s)}else active.add(i.s);drawChips();drawAnswers();drawStats();if(!answered)newQ(false)};c.appendChild(b)})}
+function drawAnswers(){const a=$("answers");a.innerHTML="";IV.filter(i=>active.has(i.s)).forEach(i=>{const b=document.createElement("button");b.className="ans";b.dataset.s=i.s;b.innerHTML=i.n+"<small>"+i.a+" · "+i.s+(i.s===1?" semitono":" semitoni")+"</small>";b.onclick=()=>answer(i.s);b.disabled=!cur||answered;a.appendChild(b)})}
+function drawStats(){const s=$("stats");s.innerHTML="";IV.filter(i=>active.has(i.s)).forEach(i=>{const t=stats[i.s]||{ok:0,tot:0},p=t.tot?Math.round(t.ok/t.tot*100):0;
+const r=document.createElement("div");r.className="st";r.innerHTML="<span>"+i.n+"</span><div class='bar'><i style='width:"+p+"%'></i></div><em>"+(t.tot?p+"%":"–")+"</em>";s.appendChild(r)});
+let ok=0,tot=0;Object.values(stats).forEach(t=>{ok+=t.ok;tot+=t.tot});$("kAcc").textContent=tot?Math.round(ok/tot*100)+"%":"–";$("kScore").textContent=score;$("kStreak").textContent=streak}
+document.querySelectorAll(".presets button").forEach(b=>b.onclick=()=>{active=new Set(PRE[b.dataset.p]);drawChips();drawAnswers();drawStats();if(!answered)newQ(false)});
+$("dir").onchange=()=>{if(!answered)newQ(false)};
+$("reset").onclick=()=>{stats={};score=0;streak=0;save();drawStats()};
+
+// audio
+function ac(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==="suspended")ctx.resume();return ctx}
+function tone(m,t,d){const c=ac(),f=440*Math.pow(2,(m-69)/12),g=c.createGain();g.connect(c.destination);
+g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.28,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+d);
+[["triangle",1,1],["sine",2,.25]].forEach(([w,mul,v])=>{const o=c.createOscillator(),h=c.createGain();o.type=w;o.frequency.value=f*mul;h.gain.value=v;o.connect(h);h.connect(g);o.start(t);o.stop(t+d+.05)})}
+function play(){if(!cur)return;const c=ac(),t=c.currentTime+.05;$("play").classList.add("on");
+if(cur.dir==="har"){tone(cur.a,t,1.6);tone(cur.b,t,1.6)}else{tone(cur.a,t,.9);tone(cur.b,t+.85,1.2)}
+clearTimeout(timer);timer=setTimeout(()=>$("play").classList.remove("on"),2100)}
+
+// domande
+function newQ(autoplay=true){
+ const pool=[...active];let s;do{s=pool[Math.floor(Math.random()*pool.length)]}while(pool.length>1&&cur&&s===cur.s&&Math.random()<.85);
+ let d=$("dir").value;if(d==="mix")d=["asc","desc","har"][Math.floor(Math.random()*3)];
+ let a,b;
+ if(d==="desc"){a=LO+s+Math.floor(Math.random()*(HI-LO-s+1));b=a-s}
+ else{a=LO+Math.floor(Math.random()*(HI-LO-s+1));b=a+s}
+ cur={s,a,b,dir:d};answered=false;light([]);
+ $("big").className="big";$("big").textContent="Che intervallo è?";
+ $("hint").textContent=d==="har"?"Le due note suonano insieme.":d==="desc"?"Le note scendono.":"Le note salgono.";
+ $("next").disabled=true;$("replay").disabled=false;drawAnswers();
+ if(autoplay)play()}
+function answer(s){if(answered||!cur)return;answered=true;const ok=s===cur.s;
+ stats[cur.s]=stats[cur.s]||{ok:0,tot:0};stats[cur.s].tot++;
+ if(ok){stats[cur.s].ok++;streak++;score+=10+Math.min(streak,10)}else streak=0;save();
+ const n=IV.find(i=>i.s===cur.s).n;
+ $("big").className="big "+(ok?"ok":"ko");$("big").textContent=ok?"Giusto! "+n:"Era: "+n;
+ $("hint").textContent=ok?"Ottimo, continua così.":"Riascolta e confronta con la tua risposta.";
+ document.querySelectorAll(".ans").forEach(b=>{b.disabled=true;if(+b.dataset.s===cur.s)b.classList.add("right");else if(+b.dataset.s===s)b.classList.add("wrong")});
+ light([cur.a,cur.b]);$("next").disabled=false;$("next").focus();drawStats()}
+
+$("play").onclick=()=>{if(!cur)newQ(true);else play()};
+$("replay").onclick=play;$("next").onclick=()=>newQ(true);
+document.addEventListener("keydown",e=>{if(e.target.tagName==="SELECT")return;
+ if(e.code==="Space"){e.preventDefault();cur?play():newQ(true)}
+ else if(e.key==="Enter"&&answered){e.preventDefault();newQ(true)}});
+drawChips();drawAnswers();drawStats();
+</script>
+</body>
+</html>
